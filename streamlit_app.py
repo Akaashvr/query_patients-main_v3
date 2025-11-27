@@ -3,14 +3,15 @@ import streamlit as st
 import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
-from openai import OpenAI
+#from openai import OpenAI
+from groq import Groq
 import os
 import bcrypt
 
 
 load_dotenv()  # reads variables from a .env file and sets them in os.environ
 
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 HASHED_PASSWORD = st.secrets["HASHED_PASSWORD"].encode("utf-8")
 
 
@@ -151,10 +152,16 @@ def run_query(sql):
         return None 
     
 
+# @st.cache_resource
+# def get_openai_client():
+#     """Create and cache OpenAI client."""
+#     return OpenAI(api_key=OPENAI_API_KEY)
+
 @st.cache_resource
-def get_openai_client():
-    """Create and cache OpenAI client."""
-    return OpenAI(api_key=OPENAI_API_KEY)
+def get_groq_client():
+    """Create and cache Groq client."""
+    return Groq(api_key=GROQ_API_KEY)
+
 
 def extract_sql_from_response(response_text):
     clean_sql = re.sub(r"^```sql\s*|\s*```$", "", response_text, flags=re.IGNORECASE | re.MULTILINE).strip()
@@ -162,7 +169,7 @@ def extract_sql_from_response(response_text):
 
 
 def generate_sql_with_gpt(user_question):
-    client = get_openai_client()
+    client = get_groq_client()
     prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
 
 {DATABASE_SCHEMA}
@@ -182,7 +189,7 @@ Generate the SQL query:"""
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.1-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are a PostgreSQL expert who generates accurate SQL queries based on natural language questions."},
                 {"role": "user", "content": prompt}
@@ -311,9 +318,9 @@ def main():
         st.subheader("📜 Query History")
         for idx, item in enumerate(reversed(st.session_state.query_history[-5:])):
             with st.expander(f"Query {len(st.session_state.query_history)-idx}: {item['question'][:60]}..."):
-                st.markdown(f"**Question:** {item["question"]}")
+                st.markdown(f"**Question:** {item['question']}")
                 st.code(item["sql"], language="sql")
-                st.caption(f"Returned {item["rows"]} rows")
+                st.caption(f"Returned {item['rows']} rows")
                 if st.button(f"Re-run this query", key=f"rerun_{idx}"):
                     df = run_query(item["sql"])
                     if df is not None:
