@@ -138,7 +138,37 @@ def get_db_connection():
     except Exception as e:
         st.error(f"Failed to connect to database: {e}")
         return None
-    
+
+@st.cache_resource
+def get_table_list():
+    conn = get_db_connection()
+    df = pd.read_sql_query("""
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public';
+    """, conn)
+    return df['table_name'].tolist()
+
+def fix_table_name(q):
+    q = q.lower()
+    tables = get_table_list()  # always up-to-date
+    best, score = process.extractOne(q, tables)
+    return best if score >= 70 else None
+
+def extract_row_count(q):
+    q = q.lower()
+    m1 = re.search(r"(\d+)\s*r", q)
+    if m1:
+        return int(m1.group(1))
+    m2 = re.search(r"(one|two|three|four|five|six|seven|eight|nine|ten|single)\s*r", q)
+    if m2:
+        word = m2.group(1)
+        if word == "single":
+            return 1
+        return w2n.word_to_num(word)
+    return None
+
+
 def run_query(sql):
     """Execute SQL query and return results as DataFrame."""
     conn = get_db_connection()
@@ -172,6 +202,15 @@ def extract_sql_from_response(response_text):
 
 def generate_sql_with_gpt(user_question):
     client = get_groq_client()
+    q = user_question.lower().strip()
+    table = fix_table_name(q)
+    limit_n = extract_row_count(q)
+    if table:
+        if limit_n:
+            return f"SELECT * FROM {table} LIMIT {limit_n};"
+        if "row" in q or "rows" in q or "table" in q:
+            return f"SELECT * FROM {table};"
+        
 #     prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
 
 # {DATABASE_SCHEMA}
@@ -228,7 +267,10 @@ Generate the SQL query:"""
         )
         
         sql_query = extract_sql_from_response(response.choices[0].message.content)
-        return sql_query
+        sql_query = sql_query.strip().rstrip(";")
+        if limit_n and "limit" not in sql_query.lower():
+            sql_query = sql_query + f" LIMIT {limit_n}"
+        return sql_query + ';'
     
     except Exception as e:
         st.error(f"Error calling GROQ API: {e}")
