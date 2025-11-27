@@ -4,5 +4,3 @@ psycopg2-binary
 python-dotenv
 groq
 bcrypt
-word2number
-thefuzz[speedup]
