@@ -209,10 +209,12 @@ ABSOLUTE RULES:
 2. NEVER remove columns the user explicitly requested.
 3. NEVER use JOINs unless the user writes the word "JOIN" or names another table.
 4. NEVER add descriptive text from lookup tables unless user explicitly asks for it.
-10. NEVER assume the user wants relationships between tables.
-12. If the user names a single table (e.g., "tableX"), default to:
+5. NEVER assume the user wants relationships between tables.
+6. If the user names a single table (e.g., "tableX"), default to:
       SELECT * FROM tableX;
-13. If user asks for specific columns, give only those columns.
+7. If user asks for specific columns, give only those columns.
+8. If user asks for specific rows, use Limit with the number of rows asked.
+
 
 Generate the SQL query:"""
 
