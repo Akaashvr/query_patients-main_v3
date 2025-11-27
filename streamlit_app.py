@@ -159,9 +159,9 @@ def run_query(sql):
 #     return OpenAI(api_key=OPENAI_API_KEY)
 
 @st.cache_resource
-def get_groq_client():
-    """Create and cache Groq client."""
-    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+def get_gemini_client():
+    """Create and cache Gemini client."""
+    return genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 
 def extract_sql_from_response(response_text):
@@ -170,7 +170,7 @@ def extract_sql_from_response(response_text):
 
 
 def generate_sql_with_gpt(user_question):
-    client = get_groq_client()
+    client = get_gemini_client()
         
 #     prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
 
@@ -222,7 +222,7 @@ Generate the SQL query:"""
         return sql_query
     
     except Exception as e:
-        st.error(f"Error calling GROQ API: {e}")
+        st.error(f"Error calling gemini API: {e}")
         return None, None
 
 
