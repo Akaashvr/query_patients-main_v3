@@ -211,7 +211,10 @@ Generate the SQL query:"""
         response = client.models.generate_content(
             model="Gemini 2.5 Flash",
             contents=prompt,
-            temperature=0
+            generation_config={
+                "temperature": 0,
+                "max_output_tokens": 1000
+            }
         )
         
         sql_query = extract_sql_from_response(response.choices[0].message.content)
