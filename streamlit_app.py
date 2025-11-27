@@ -146,6 +146,7 @@ def run_query(sql):
     
     try:
         df = pd.read_sql_query(sql, conn)
+        df = df.astype(str)
         return df
     except Exception as e:
         st.error(f"Error executing query: {e}")
