@@ -4,7 +4,7 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 #from openai import OpenAI
-from google.genai import Client
+import google.generativeai as genai
 import os
 import bcrypt
 
@@ -161,7 +161,8 @@ def run_query(sql):
 @st.cache_resource
 def get_gemini_client():
     """Create and cache Gemini client."""
-    return Client(api_key=st.secrets["GEMINI_API_KEY"])
+    genai.configure(api_key=GEMINI_API_KEY)
+    return genai.GenerativeModel("models/gemini-2.5-flash")
 
 
 def extract_sql_from_response(response_text):
@@ -188,7 +189,6 @@ def generate_sql_with_gpt(user_question):
 # 7. Add helpful column aliases using AS
 
 # Generate the SQL query:"""
-    
     prompt = f"""You are a STRICT PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query. 
     
 {DATABASE_SCHEMA}
@@ -208,15 +208,7 @@ Requirements:
 Generate the SQL query:"""
 
     try:
-        response = client.models.generate_content(
-            model="Gemini 2.5 Flash",
-            contents=prompt,
-            generation_config={
-                "temperature": 0,
-                "max_output_tokens": 1000
-            }
-        )
-        
+        response = client.generate_content(prompt)     
         sql_query = extract_sql_from_response(response.choices[0].message.content)
         return sql_query
     
