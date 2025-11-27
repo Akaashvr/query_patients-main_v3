@@ -4,7 +4,7 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 #from openai import OpenAI
-from google import genai
+from google.genai import Client
 import os
 import bcrypt
 
@@ -161,7 +161,7 @@ def run_query(sql):
 @st.cache_resource
 def get_gemini_client():
     """Create and cache Gemini client."""
-    return genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+    return Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 
 def extract_sql_from_response(response_text):
@@ -208,14 +208,10 @@ Requirements:
 Generate the SQL query:"""
 
     try:
-        response = client.chat.completions.create(
+        response = client.models.generate_content(
             model="Gemini 2.5 Flash",
-            messages=[
-                {"role": "system", "content": "You are a PostgreSQL expert who generates accurate SQL queries based on natural language questions."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.1,
-            max_tokens=1000
+            contents=prompt,
+            generation_config={"temperature": 0}
         )
         
         sql_query = extract_sql_from_response(response.choices[0].message.content)
