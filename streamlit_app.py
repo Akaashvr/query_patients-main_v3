@@ -202,7 +202,7 @@ Generate the SQL query:"""
         return sql_query
     
     except Exception as e:
-        st.error(f"Error calling OpenAI API: {e}")
+        st.error(f"Error calling GROQ API: {e}")
         return None, None
 
 def main():
