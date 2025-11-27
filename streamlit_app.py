@@ -4,13 +4,13 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 #from openai import OpenAI
-from groq import Groq
+from google import genai
 import os
 import bcrypt
 
 load_dotenv()  # reads variables from a .env file and sets them in os.environ
 
-GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 HASHED_PASSWORD = st.secrets["HASHED_PASSWORD"].encode("utf-8")
 
 
@@ -161,7 +161,7 @@ def run_query(sql):
 @st.cache_resource
 def get_groq_client():
     """Create and cache Groq client."""
-    return Groq(api_key=GROQ_API_KEY)
+    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 
 def extract_sql_from_response(response_text):
@@ -209,7 +209,7 @@ Generate the SQL query:"""
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="Gemini 2.5 Flash",
             messages=[
                 {"role": "system", "content": "You are a PostgreSQL expert who generates accurate SQL queries based on natural language questions."},
                 {"role": "user", "content": prompt}
