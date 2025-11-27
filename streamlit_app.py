@@ -170,12 +170,29 @@ def extract_sql_from_response(response_text):
 
 def generate_sql_with_gpt(user_question):
     client = get_groq_client()
-    prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
+#     prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
 
+# {DATABASE_SCHEMA}
+
+# User Question: {user_question}
+
+# Requirements:
+# 1. Generate ONLY the SQL query that I can directly use. No other response.
+# 2. Use proper JOINs to get descriptive names from lookup tables
+# 3. Use appropriate aggregations (COUNT, AVG, SUM, etc.) when needed
+# 4. Add LIMIT clauses for queries that might return many rows (default LIMIT 100)
+# 5. Use proper date/time functions for TIMESTAMP columns
+# 6. Make sure the query is syntactically correct for PostgreSQL
+# 7. Add helpful column aliases using AS
+
+# Generate the SQL query:"""
+    
+    prompt = f"""You are a STRICT PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query. 
+    
 {DATABASE_SCHEMA}
 
 User Question: {user_question}
-
+You MUST follow the user's instructions accuratly and provide what's exactly asked.
 Requirements:
 1. Generate ONLY the SQL query that I can directly use. No other response.
 2. Use proper JOINs to get descriptive names from lookup tables
@@ -184,6 +201,24 @@ Requirements:
 5. Use proper date/time functions for TIMESTAMP columns
 6. Make sure the query is syntactically correct for PostgreSQL
 7. Add helpful column aliases using AS
+
+
+ABSOLUTE RULES:
+1. NEVER add columns the user did not explicitly request.
+2. NEVER remove columns the user explicitly requested.
+3. NEVER use JOINs unless the user writes the word "JOIN" or names another table.
+4. NEVER add descriptive text from lookup tables unless user explicitly asks for it.
+5. NEVER change column names, NEVER add aliases.
+6. NEVER add ORDER BY unless user asks.
+7. NEVER add LIMIT unless user asks.
+8. NEVER rewrite or optimize the query.
+9. NEVER assume the user wants descriptive names.
+10. NEVER assume the user wants relationships between tables.
+11. ALWAYS generate EXACTLY what the user asked for, even if it looks incomplete.
+12. If the user names a single table (e.g., "tableX"), default to:
+      SELECT * FROM tableX;
+13. If user asks for specific columns, give only those columns.
+14. If user asks a vague question, DO NOT guess — return the simplest literal query.
 
 Generate the SQL query:"""
 
