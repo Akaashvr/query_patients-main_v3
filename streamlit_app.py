@@ -189,7 +189,7 @@ Generate the SQL query:"""
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model="llama-3.2-70b",
             messages=[
                 {"role": "system", "content": "You are a PostgreSQL expert who generates accurate SQL queries based on natural language questions."},
                 {"role": "user", "content": prompt}
