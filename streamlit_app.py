@@ -209,17 +209,10 @@ ABSOLUTE RULES:
 2. NEVER remove columns the user explicitly requested.
 3. NEVER use JOINs unless the user writes the word "JOIN" or names another table.
 4. NEVER add descriptive text from lookup tables unless user explicitly asks for it.
-5. NEVER change column names, NEVER add aliases.
-6. NEVER add ORDER BY unless user asks.
-7. NEVER add LIMIT unless user asks.
-8. NEVER rewrite or optimize the query.
-9. NEVER assume the user wants descriptive names.
 10. NEVER assume the user wants relationships between tables.
-11. ALWAYS generate EXACTLY what the user asked for, even if it looks incomplete.
 12. If the user names a single table (e.g., "tableX"), default to:
       SELECT * FROM tableX;
 13. If user asks for specific columns, give only those columns.
-14. If user asks a vague question, DO NOT guess — return the simplest literal query.
 
 Generate the SQL query:"""
 
