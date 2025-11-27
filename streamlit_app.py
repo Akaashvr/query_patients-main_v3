@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 from groq import Groq
 import os
 import bcrypt
-
+from word2number import w2n
+from thefuzz import process
 
 load_dotenv()  # reads variables from a .env file and sets them in os.environ
 
@@ -205,15 +206,12 @@ Requirements:
 
 
 ABSOLUTE RULES:
-1. NEVER add columns the user did not explicitly request.
-2. NEVER remove columns the user explicitly requested.
-3. NEVER use JOINs unless the user writes the word "JOIN" or names another table.
-4. NEVER add descriptive text from lookup tables unless user explicitly asks for it.
-5. NEVER assume the user wants relationships between tables.
-6. If the user names a single table (e.g., "tableX"), default to:
+1. NEVER use JOINs unless the user writes the word "JOIN" or names another table.
+2. NEVER assume the user wants relationships between tables.
+3. If the user names a single table (e.g., "tableX"), default to:
       SELECT * FROM tableX;
-7. If user asks for specific columns, give only those columns.
-8. If user asks for specific rows, use Limit with the number of rows asked.
+4. If user asks for specific columns, give only those columns.
+5. If user asks for specific rows, use Limit with the number of rows asked.
 
 
 Generate the SQL query:"""
@@ -235,6 +233,7 @@ Generate the SQL query:"""
     except Exception as e:
         st.error(f"Error calling GROQ API: {e}")
         return None, None
+
 
 def main():
     require_login()
