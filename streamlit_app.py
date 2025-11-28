@@ -11,7 +11,7 @@ import bcrypt
 
 load_dotenv()  # reads variables from a .env file and sets them in os.environ
 
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 HASHED_PASSWORD = st.secrets["HASHED_PASSWORD"].encode("utf-8")
 
 
@@ -152,13 +152,16 @@ def run_query(sql):
         return None 
     
 
-@st.cache_resource
-def get_openai_client():
-    """Create and cache Gemini model (we reuse OPENAI_API_KEY for Gemini)."""
-    genai.configure(api_key=OPENAI_API_KEY)
-    # You can switch to "gemini-1.0-pro" if you want
-    return genai.GenerativeModel("models/gemini-2.5-flash")
+# @st.cache_resource
+# def get_openai_client():
+#     """Create and cache OpenAI client."""
+#     return OpenAI(api_key=OPENAI_API_KEY)
 
+@st.cache_resource
+def get_gemini_client():
+    """Create and cache Gemini client."""
+    genai.configure(api_key=GEMINI_API_KEY)
+    return genai.GenerativeModel("models/gemini-2.5-flash")
 
 
 def extract_sql_from_response(response_text):
@@ -167,8 +170,8 @@ def extract_sql_from_response(response_text):
 
 
 def generate_sql_with_gpt(user_question):
-    model = get_openai_client()
-    prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
+    client = get_gemini_client()
+    prompt = f"""You are a STRICT PostgreSQL expert. Given the following database schema and a user's question, generate a valid accurate PostgreSQL query.
 
 {DATABASE_SCHEMA}
 
@@ -186,14 +189,13 @@ Requirements:
 Generate the SQL query:"""
 
     try:
-        # Call Gemini instead of OpenAI
-        response = model.generate_content(prompt)
+        response = client.generate_content(prompt)
         sql_query = extract_sql_from_response(response.text)
         return sql_query
 
     except Exception as e:
         st.error(f"Error calling Gemini API: {e}")
-        return None
+        return None, None
 
 
 def main():
