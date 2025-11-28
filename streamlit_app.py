@@ -3,14 +3,15 @@ import streamlit as st
 import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
-#from openai import OpenAI
+# from openai import OpenAI
 import google.generativeai as genai
 import os
 import bcrypt
 
+
 load_dotenv()  # reads variables from a .env file and sets them in os.environ
 
-GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
 HASHED_PASSWORD = st.secrets["HASHED_PASSWORD"].encode("utf-8")
 
 
@@ -136,8 +137,7 @@ def get_db_connection():
     except Exception as e:
         st.error(f"Failed to connect to database: {e}")
         return None
-
-
+    
 def run_query(sql):
     """Execute SQL query and return results as DataFrame."""
     conn = get_db_connection()
@@ -146,23 +146,19 @@ def run_query(sql):
     
     try:
         df = pd.read_sql_query(sql, conn)
-        df = df.astype(str)
         return df
     except Exception as e:
         st.error(f"Error executing query: {e}")
         return None 
     
 
-# @st.cache_resource
-# def get_openai_client():
-#     """Create and cache OpenAI client."""
-#     return OpenAI(api_key=OPENAI_API_KEY)
-
 @st.cache_resource
-def get_gemini_client():
-    """Create and cache Gemini client."""
-    genai.configure(api_key=GEMINI_API_KEY)
+def get_openai_client():
+    """Create and cache Gemini model (we reuse OPENAI_API_KEY for Gemini)."""
+    genai.configure(api_key=OPENAI_API_KEY)
+    # You can switch to "gemini-1.0-pro" if you want
     return genai.GenerativeModel("models/gemini-2.5-flash")
+
 
 
 def extract_sql_from_response(response_text):
@@ -171,30 +167,13 @@ def extract_sql_from_response(response_text):
 
 
 def generate_sql_with_gpt(user_question):
-    client = get_gemini_client()
-        
-#     prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
+    model = get_openai_client()
+    prompt = f"""You are a PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query.
 
-# {DATABASE_SCHEMA}
-
-# User Question: {user_question}
-
-# Requirements:
-# 1. Generate ONLY the SQL query that I can directly use. No other response.
-# 2. Use proper JOINs to get descriptive names from lookup tables
-# 3. Use appropriate aggregations (COUNT, AVG, SUM, etc.) when needed
-# 4. Add LIMIT clauses for queries that might return many rows (default LIMIT 100)
-# 5. Use proper date/time functions for TIMESTAMP columns
-# 6. Make sure the query is syntactically correct for PostgreSQL
-# 7. Add helpful column aliases using AS
-
-# Generate the SQL query:"""
-    prompt = f"""You are a STRICT PostgreSQL expert. Given the following database schema and a user's question, generate a valid PostgreSQL query. 
-    
 {DATABASE_SCHEMA}
 
 User Question: {user_question}
-You MUST follow the user's instructions accuratly and provide what's exactly asked.
+
 Requirements:
 1. Generate ONLY the SQL query that I can directly use. No other response.
 2. Use proper JOINs to get descriptive names from lookup tables
@@ -204,17 +183,17 @@ Requirements:
 6. Make sure the query is syntactically correct for PostgreSQL
 7. Add helpful column aliases using AS
 
-
 Generate the SQL query:"""
 
     try:
-        response = client.generate_content(prompt)     
-        sql_query = extract_sql_from_response(response.choices[0].message.content)
+        # Call Gemini instead of OpenAI
+        response = model.generate_content(prompt)
+        sql_query = extract_sql_from_response(response.text)
         return sql_query
-    
+
     except Exception as e:
-        st.error(f"Error calling gemini API: {e}")
-        return None, None
+        st.error(f"Error calling Gemini API: {e}")
+        return None
 
 
 def main():
@@ -330,9 +309,9 @@ def main():
         st.subheader("📜 Query History")
         for idx, item in enumerate(reversed(st.session_state.query_history[-5:])):
             with st.expander(f"Query {len(st.session_state.query_history)-idx}: {item['question'][:60]}..."):
-                st.markdown(f"**Question:** {item['question']}")
+                st.markdown(f"**Question:** {item["question"]}")
                 st.code(item["sql"], language="sql")
-                st.caption(f"Returned {item['rows']} rows")
+                st.caption(f"Returned {item["rows"]} rows")
                 if st.button(f"Re-run this query", key=f"rerun_{idx}"):
                     df = run_query(item["sql"])
                     if df is not None:
