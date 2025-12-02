@@ -349,29 +349,57 @@ def apply_neon_theme():
         }
 
         /* === FIX CHAT INPUT AT BOTTOM (GPT-style) === */
-        div[data-testid="stChatInput"] {
-            position: fixed;
-            bottom: 12px;                 /* a little up from bottom */
-            left: 0;
-            right: 0;
-            padding: 0.35rem 1.5rem 0.55rem 1.5rem;  /* smaller height */
-            background: #050814ee;
-            backdrop-filter: blur(6px);
-            border-top: 1px solid #11ffee44;
-            z-index: 9999;
-        }
+        /* === CHAT INPUT: centered, shorter, GPT-style pill === */
+div[data-testid="stChatInput"] {
+    position: fixed;
+    bottom: 20px;          /* a bit higher from the very bottom */
+    left: 0;
+    right: 0;
+    padding: 0;            /* no outer padding, we style inner div */
+    background: transparent;
+    z-index: 9999;
+}
 
-        /* Make chat text box itself smaller */
-        div[data-testid="stChatInput"] textarea {
-            min-height: 2.2rem !important;
-            max-height: 3rem !important;
-            font-size: 0.9rem !important;
-        }
+/* Inner wrapper that actually looks like the bar */
+div[data-testid="stChatInput"] > div {
+    max-width: 850px;                          /* shorter width */
+    margin: 0 auto;                            /* centered */
+    background: #050814f2;                     /* dark pill */
+    border-radius: 999px;
+    border: 1px solid #11ffee88;
+    padding: 0.2rem 0.75rem;
+    display: flex;
+    align-items: center;
+}
 
-        /* Make room so content doesn't hide behind chat input */
-        .block-container {
-            padding-bottom: 130px !important;
-        }
+/* Text area inside the chat input */
+div[data-testid="stChatInput"] textarea {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 1.8rem !important;             /* shorter height */
+    max-height: 2.6rem !important;
+    padding: 0.35rem 0.4rem !important;
+    font-size: 0.9rem !important;
+}
+
+/* Send button (the arrow) */
+div[data-testid="stChatInput"] button {
+    background-color: #11ffee33 !important;
+    border-radius: 999px !important;
+    border: 1px solid #11ffeeaa !important;
+    color: #e6faff !important;
+    padding: 0.1rem 0.9rem !important;
+    font-size: 0.9rem !important;
+}
+div[data-testid="stChatInput"] button:hover {
+    background-color: #11ffee66 !important;
+}
+
+/* Give content some room so it doesn't hide behind the chat bar */
+.block-container {
+    padding-bottom: 140px !important;
+}
 
         </style>
     """, unsafe_allow_html=True)
