@@ -350,10 +350,111 @@ def apply_neon_theme():
         </style>
     """, unsafe_allow_html=True)
 
+def apply_anime_theme():
+    st.markdown("""
+    <style>
+
+    /* GLOBAL BACKGROUND — Soft gradient anime sky */
+    .stApp {
+        background: linear-gradient(135deg, #f7eaff 0%, #e0f3ff 50%, #ffe6f0 100%) !important;
+        font-family: 'Poppins', sans-serif !important;
+        color: #3a3a3a !important;
+    }
+
+    /* Use a cute anime font (Google Font) */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Nunito:wght@300;400;700&display=swap');
+
+    /* HEADERS — anime neon pastel glow */
+    h1, h2, h3 {
+        color: #ff6fb5 !important;
+        text-shadow: 0 0 10px #ffd3e2;
+        font-family: 'Nunito', sans-serif !important;
+        font-weight: 700 !important;
+    }
+
+    /* SIDEBAR — anime notebook style */
+    section[data-testid="stSidebar"] {
+        background: #ffffffcc !important;
+        backdrop-filter: blur(10px);
+        border-right: 2px solid #ffbde6;
+    }
+
+    /* SIDEBAR text */
+    .css-1lcbmhc, .css-nqowgj, .css-1d391kg {
+        color: #ff6fb5 !important;
+        font-weight: 600;
+    }
+
+    /* BUTTONS — Pastel anime pink */
+    div.stButton > button {
+        background: #ffbde6;
+        color: #5a0035;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        border: none;
+        font-weight: 600;
+        transition: 0.2s;
+        box-shadow: 0 0 8px #ffbde6;
+    }
+
+    div.stButton > button:hover {
+        background: #ff9dd6;
+        box-shadow: 0 0 15px #ff9dd6;
+        color: white;
+    }
+
+    /* TEXT AREAS — anime gradient border */
+    textarea, input {
+        background: #ffffffdd !important;
+        backdrop-filter: blur(5px);
+        border-radius: 10px !important;
+        border: 2px solid #ffd6f2 !important;
+    }
+
+    /* EXPANDERS — cute rounded pastel cards */
+    .streamlit-expanderHeader {
+        background: #ffe3f7 !important;
+        color: #c4006c !important;
+        border-radius: 8px !important;
+        font-weight: 600;
+        padding: 10px;
+    }
+
+    .streamlit-expanderContent {
+        background: #fff7fc !important;
+        border-left: 2px solid #ffbde6;
+        padding: 10px 15px;
+        border-radius: 10px;
+    }
+
+    /* DATAFRAME — manga table look */
+    .stDataFrame, .dataframe {
+        border: 2px solid #ffbde6 !important;
+        border-radius: 10px !important;
+        background: #ffffffcc !important;
+    }
+
+    /* INFO / SUCCESS / WARNING boxes — pastel soft colors */
+    .stAlert {
+        border-radius: 10px !important;
+        background: #fff1f8 !important;
+        border-left: 5px solid #ff8bc4 !important;
+    }
+
+    /* Fix container padding for cleaner anime look */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
 
 def main():
     require_login()
     apply_neon_theme()
+    apply_anime_theme()
     st.title("🤖 AI-Powered SQL Query Assistant")
     st.markdown("Ask questions in natural language, and I will generate SQL queries for you to review and run!")
     st.markdown("---")
