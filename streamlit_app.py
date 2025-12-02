@@ -469,15 +469,179 @@ def apply_anime_terminal_hacker_theme():
     </style>
     """, unsafe_allow_html=True)
 
+def apply_chat_layout_style():
+    st.markdown("""
+    <style>
+    /* Chat container – scroll from top */
+    .chat-container {
+        height: calc(100vh - 220px);
+        overflow-y: auto;
+        padding-right: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* Bottom input area (fixed look) */
+    .bottom-input {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #0b0b14;
+        padding: 20px;
+        border-top: 2px solid #ff66cc55;
+        box-shadow: 0 0 20px #ff33cc22;
+    }
+
+    /* Ensure main block container has padding so content is visible */
+    .block-container {
+        padding-bottom: 240px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+# def main():
+#     require_login()
+#     #apply_neon_theme()
+#     apply_anime_terminal_hacker_theme()
+#     apply_chat_layout_style()
+#     st.title("🤖 AI-Powered SQL Query Assistant")
+#     st.markdown("Ask questions in natural language, and I will generate SQL queries for you to review and run!")
+#     st.markdown("---")
+
+
+#     st.sidebar.title("💡 Example Questions")
+#     st.sidebar.markdown("""
+#     Try asking questions like:
+
+#     **Anime stats:**
+#     - What are the top 10 highest-rated anime?
+#     - Show average user score by genre.
+#     - List the most popular anime by studio.
+
+#     **User behavior:**
+#     - How many users are from each country?
+#     - What is the distribution of watch status (Completed, Watching, etc.)?
+#     - For each age group, what is the average user score?
+
+#     **Combined:**
+#     - For each genre, show the top 5 anime by average user score.
+#     """)
+#     st.sidebar.markdown("---")
+#     st.sidebar.info("""
+#         🩼**How it works:**
+#         1. Enter your question in plain English
+#         2. AI generates SQL query
+#         3. Review and optionally edit the query
+#         4. Click "Run Query" to execute           
+#     """)
+
+#     st.sidebar.markdown("---")
+#     if st.sidebar.button("🚪Logout"):
+#         st.session_state.logged_in = False
+#         st.rerun()
+
+#     # Init state
+
+#     if 'query_history' not in st.session_state:
+#         st.session_state.query_history = []
+#     if 'generated_sql' not in st.session_state:
+#         st.session_state.generated_sql = None
+#     if 'current_question' not in st.session_state:
+#         st.session_state.current_question = None
+
+
+#     # main input
+
+#     user_question = st.text_area(
+#     "What would you like to know?",
+#     height=100,
+#     placeholder="Example: Show the top 10 anime by average user rating, with their genres and studios.",
+#     )
+
+#     col1, col2, col3 = st.columns([1, 1, 4])
+    
+#     with col1:
+#         generate_button = st.button(" Generate SQL", type="primary", width="stretch")
+
+#     with col2:
+#         if st.button(" Clear History", width="stretch"):
+#             st.session_state.query_history = []
+#             st.session_state.generated_sql = None
+#             st.session_state.current_question = None
+
+#     if generate_button and user_question:
+#         user_question = user_question.strip()
+
+#         if st.session_state.current_question != user_question:
+#             st.session_state.generated_sql = None
+#             st.session_state.current_question = None
+            
+
+
+#         with st.spinner("🧠 AI is thinking and generating SQL..."):
+#             sql_query = generate_sql_with_gpt(user_question)
+#             if sql_query:        
+#                 st.session_state.generated_sql = sql_query
+#                 st.session_state.current_question = user_question
+
+#     if st.session_state.generated_sql:
+#         st.markdown("---")
+#         st.subheader("Generated SQL Query")
+#         st.info(f"**Question:** {st.session_state.current_question}")
+
+#         edited_sql = st.text_area(
+#             "Review and edit the SQL query if needed:", 
+#             value=st.session_state.generated_sql,
+#             height=200,
+#         )
+
+#         col1, col2 = st.columns([1, 5])
+
+#         with col1:
+#             run_button = st.button("Run Query", type="primary", width="stretch")
+
+#         if run_button:
+#             with st.spinner("Executing query ..."):
+#                 df = run_query(edited_sql)
+                
+#                 if df is not None:
+#                     st.session_state.query_history.append(
+#                         {'question': user_question, 
+#                         'sql': edited_sql, 
+#                         'rows': len(df)}
+#                     )
+
+#                     st.markdown("---")
+#                     st.subheader("📊 Query Results")
+#                     st.success(f"✅ Query returned {len(df)} rows")
+#                     st.dataframe(df, width="stretch")
+
+
+#     if st.session_state.query_history:
+#         st.markdown('---')
+#         st.subheader("📜 Query History")
+#         for idx, item in enumerate(reversed(st.session_state.query_history[-5:])):
+#             with st.expander(f"Query {len(st.session_state.query_history)-idx}: {item['question'][:60]}..."):
+#                 st.markdown(f"**Question:** {item['question']}")
+#                 st.code(item["sql"], language="sql")
+#                 st.caption(f"Returned {item['rows']} rows")
+#                 if st.button(f"Re-run this query", key=f"rerun_{idx}"):
+#                     df = run_query(item["sql"])
+#                     if df is not None:
+#                         st.dataframe(df, width="stretch")
+
+
+# if __name__ == "__main__":
+#     main()
 def main():
     require_login()
-    #apply_neon_theme()
     apply_anime_terminal_hacker_theme()
+    apply_chat_layout_style()
+
     st.title("🤖 AI-Powered SQL Query Assistant")
-    st.markdown("Ask questions in natural language, and I will generate SQL queries for you to review and run!")
-    st.markdown("---")
 
-
+    # ---------- SIDEBAR ----------
     st.sidebar.title("💡 Example Questions")
     st.sidebar.markdown("""
     Try asking questions like:
@@ -498,107 +662,67 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.info("""
         🩼**How it works:**
-        1. Enter your question in plain English
-        2. AI generates SQL query
-        3. Review and optionally edit the query
-        4. Click "Run Query" to execute           
+        1. Enter your question in plain English  
+        2. AI generates SQL query  
+        3. Review and optionally edit  
+        4. Click "Run Query"           
     """)
-
     st.sidebar.markdown("---")
+
     if st.sidebar.button("🚪Logout"):
         st.session_state.logged_in = False
         st.rerun()
 
-    # Init state
-
-    if 'query_history' not in st.session_state:
+    # ---------- SESSION ----------
+    if "query_history" not in st.session_state:
         st.session_state.query_history = []
-    if 'generated_sql' not in st.session_state:
-        st.session_state.generated_sql = None
-    if 'current_question' not in st.session_state:
-        st.session_state.current_question = None
 
+    # ---------- CHAT DISPLAY AREA (TOP) ----------
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
-    # main input
+    for item in st.session_state.query_history:
+        st.markdown(f"### 🧠 Question: {item['question']}")
+        st.code(item["sql"], language="sql")
+
+        if item.get("df") is not None:
+            st.dataframe(item["df"], use_container_width=True)
+
+        st.caption(f"Returned {item['rows']} rows")
+        st.markdown("---")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ---------- BOTTOM INPUT BAR ----------
+    st.markdown('<div class="bottom-input">', unsafe_allow_html=True)
 
     user_question = st.text_area(
-    "What would you like to know?",
-    height=100,
-    placeholder="Example: Show the top 10 anime by average user rating, with their genres and studios.",
+        "Ask something about anime:",
+        placeholder="Example: Show top anime by average user rating…",
+        key="chat_input",
+        height=80
     )
 
-    col1, col2, col3 = st.columns([1, 1, 4])
-    
-    with col1:
-        generate_button = st.button(" Generate SQL", type="primary", width="stretch")
+    send = st.button("Generate SQL", type="primary", key="send_button")
 
-    with col2:
-        if st.button(" Clear History", width="stretch"):
-            st.session_state.query_history = []
-            st.session_state.generated_sql = None
-            st.session_state.current_question = None
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    if generate_button and user_question:
-        user_question = user_question.strip()
+    # ---------- HANDLE GENERATION ----------
+    if send and user_question.strip():
+        q = user_question.strip()
 
-        if st.session_state.current_question != user_question:
-            st.session_state.generated_sql = None
-            st.session_state.current_question = None
-            
+        with st.spinner("🧠 Generating SQL..."):
+            sql_query = generate_sql_with_gpt(q)
 
+        df = None
+        if sql_query:
+            with st.spinner("Running SQL query..."):
+                df = run_query(sql_query)
 
-        with st.spinner("🧠 AI is thinking and generating SQL..."):
-            sql_query = generate_sql_with_gpt(user_question)
-            if sql_query:        
-                st.session_state.generated_sql = sql_query
-                st.session_state.current_question = user_question
+        st.session_state.query_history.append({
+            "question": q,
+            "sql": sql_query,
+            "rows": 0 if df is None else len(df),
+            "df": df
+        })
 
-    if st.session_state.generated_sql:
-        st.markdown("---")
-        st.subheader("Generated SQL Query")
-        st.info(f"**Question:** {st.session_state.current_question}")
-
-        edited_sql = st.text_area(
-            "Review and edit the SQL query if needed:", 
-            value=st.session_state.generated_sql,
-            height=200,
-        )
-
-        col1, col2 = st.columns([1, 5])
-
-        with col1:
-            run_button = st.button("Run Query", type="primary", width="stretch")
-
-        if run_button:
-            with st.spinner("Executing query ..."):
-                df = run_query(edited_sql)
-                
-                if df is not None:
-                    st.session_state.query_history.append(
-                        {'question': user_question, 
-                        'sql': edited_sql, 
-                        'rows': len(df)}
-                    )
-
-                    st.markdown("---")
-                    st.subheader("📊 Query Results")
-                    st.success(f"✅ Query returned {len(df)} rows")
-                    st.dataframe(df, width="stretch")
-
-
-    if st.session_state.query_history:
-        st.markdown('---')
-        st.subheader("📜 Query History")
-        for idx, item in enumerate(reversed(st.session_state.query_history[-5:])):
-            with st.expander(f"Query {len(st.session_state.query_history)-idx}: {item['question'][:60]}..."):
-                st.markdown(f"**Question:** {item['question']}")
-                st.code(item["sql"], language="sql")
-                st.caption(f"Returned {item['rows']} rows")
-                if st.button(f"Re-run this query", key=f"rerun_{idx}"):
-                    df = run_query(item["sql"])
-                    if df is not None:
-                        st.dataframe(df, width="stretch")
-
-
-if __name__ == "__main__":
-    main()
+        st.rerun()
