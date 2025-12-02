@@ -350,111 +350,129 @@ def apply_neon_theme():
         </style>
     """, unsafe_allow_html=True)
 
-def apply_anime_theme():
+def apply_anime_terminal_hacker_theme():
     st.markdown("""
     <style>
 
-    /* GLOBAL BACKGROUND — Soft gradient anime sky */
+    /* GLOBAL BACKGROUND — Cyber Tokyo night */
     .stApp {
-        background: linear-gradient(135deg, #f7eaff 0%, #e0f3ff 50%, #ffe6f0 100%) !important;
-        font-family: 'Poppins', sans-serif !important;
-        color: #3a3a3a !important;
+        background: radial-gradient(circle at 20% 20%, #1a1a2f 0%, #0b0b14 80%) !important;
+        color: #d9e4ff !important;
+        font-family: "IBM Plex Mono", monospace !important;
     }
 
-    /* Use a cute anime font (Google Font) */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Nunito:wght@300;400;700&display=swap');
+    /* Import clean anime terminal fonts */
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Share+Tech+Mono&display=swap');
 
-    /* HEADERS — anime neon pastel glow */
-    h1, h2, h3 {
-        color: #ff6fb5 !important;
-        text-shadow: 0 0 10px #ffd3e2;
-        font-family: 'Nunito', sans-serif !important;
-        font-weight: 700 !important;
+    h1, h2, h3, h4 {
+        font-family: "Share Tech Mono", monospace !important;
+        color: #ff66cc !important;
+        text-shadow: 0 0 8px #ff66ccaa, 0 0 12px #ff33cc66;
     }
 
-    /* SIDEBAR — anime notebook style */
+    /* Scanlines effect (subtle anime CRT) */
+    .stApp:before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.03),
+            rgba(255,255,255,0.03) 1px,
+            transparent 2px,
+            transparent 3px
+        );
+        pointer-events: none;
+    }
+
+    /* SIDEBAR — glowy hacker panel */
     section[data-testid="stSidebar"] {
-        background: #ffffffcc !important;
-        backdrop-filter: blur(10px);
-        border-right: 2px solid #ffbde6;
+        background: #121225 !important;
+        border-right: 2px solid #ff66cc55 !important;
+        box-shadow: 0 0 20px #ff33cc22;
     }
 
     /* SIDEBAR text */
     .css-1lcbmhc, .css-nqowgj, .css-1d391kg {
-        color: #ff6fb5 !important;
-        font-weight: 600;
+        color: #8cc6ff !important;
+        font-family: "IBM Plex Mono", monospace !important;
     }
 
-    /* BUTTONS — Pastel anime pink */
+    /* TERMINAL-STYLE BUTTONS */
     div.stButton > button {
-        background: #ffbde6;
-        color: #5a0035;
-        border-radius: 10px;
-        padding: 0.6rem 1.2rem;
-        border: none;
-        font-weight: 600;
-        transition: 0.2s;
-        box-shadow: 0 0 8px #ffbde6;
+        background: #1b1b2f !important;
+        border: 1px solid #00eaff;
+        color: #00eaff;
+        border-radius: 4px;
+        font-family: "Share Tech Mono", monospace !important;
+        padding: 0.4rem 1rem;
+        text-shadow: 0 0 8px #00eaff88;
+        transition: 0.15s;
     }
 
     div.stButton > button:hover {
-        background: #ff9dd6;
-        box-shadow: 0 0 15px #ff9dd6;
-        color: white;
+        background: #00eaff22 !important;
+        color: #fff;
+        border-color: #00eaff;
+        box-shadow: 0 0 15px #00eaffaa;
     }
 
-    /* TEXT AREAS — anime gradient border */
+    /* TEXT AREAS — terminal green glow */
     textarea, input {
-        background: #ffffffdd !important;
-        backdrop-filter: blur(5px);
-        border-radius: 10px !important;
-        border: 2px solid #ffd6f2 !important;
+        background: #0f0f1f !important;
+        color: #c6f7ff !important;
+        border-radius: 6px !important;
+        border: 1px solid #ff66cc55 !important;
+        font-family: "IBM Plex Mono", monospace !important;
+        box-shadow: 0 0 10px #ff66cc22;
     }
 
-    /* EXPANDERS — cute rounded pastel cards */
+    /* DATAFRAME — matrix terminal grid */
+    .stDataFrame, .dataframe {
+        background: #101020 !important;
+        color: #d9e4ff !important;
+        border: 2px solid #00eaff55 !important;
+        border-radius: 6px;
+        box-shadow: 0 0 12px #00eaff33;
+    }
+
+    /* EXPANDERS — cyber anime panels */
     .streamlit-expanderHeader {
-        background: #ffe3f7 !important;
-        color: #c4006c !important;
-        border-radius: 8px !important;
-        font-weight: 600;
-        padding: 10px;
+        background: #141426 !important;
+        color: #ff66cc !important;
+        border: 1px solid #ff66cc55;
+        border-radius: 6px;
+        font-family: "Share Tech Mono", monospace !important;
     }
 
     .streamlit-expanderContent {
-        background: #fff7fc !important;
-        border-left: 2px solid #ffbde6;
-        padding: 10px 15px;
-        border-radius: 10px;
+        background: #0d0d19 !important;
+        border-left: 2px solid #ff66cc55;
+        border-radius: 6px;
+        padding: 10px;
     }
 
-    /* DATAFRAME — manga table look */
-    .stDataFrame, .dataframe {
-        border: 2px solid #ffbde6 !important;
-        border-radius: 10px !important;
-        background: #ffffffcc !important;
-    }
-
-    /* INFO / SUCCESS / WARNING boxes — pastel soft colors */
+    /* ALERT boxes (info, success, etc.) */
     .stAlert {
-        border-radius: 10px !important;
-        background: #fff1f8 !important;
-        border-left: 5px solid #ff8bc4 !important;
+        background: #0f0f1f !important;
+        border-left: 4px solid #00eaff;
+        color: #d9e4ff !important;
+        border-radius: 4px;
+        font-family: "IBM Plex Mono", monospace !important;
     }
 
-    /* Fix container padding for cleaner anime look */
+    /* Remove padding for tighter terminal look */
     .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
+        padding-top: 1.5rem;
     }
 
     </style>
     """, unsafe_allow_html=True)
 
-
 def main():
     require_login()
-    apply_neon_theme()
-    apply_anime_theme()
+    #apply_neon_theme()
+    apply_anime_terminal_hacker_theme()
     st.title("🤖 AI-Powered SQL Query Assistant")
     st.markdown("Ask questions in natural language, and I will generate SQL queries for you to review and run!")
     st.markdown("---")
