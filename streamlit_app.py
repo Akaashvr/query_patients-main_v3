@@ -469,42 +469,11 @@ def apply_anime_terminal_hacker_theme():
     </style>
     """, unsafe_allow_html=True)
 
-def apply_chat_layout_style():
-    st.markdown("""
-    <style>
-    /* Chat container – scroll from top */
-    .chat-container {
-        height: calc(100vh - 220px);
-        overflow-y: auto;
-        padding-right: 10px;
-        margin-bottom: 20px;
-    }
-
-    /* Bottom input area (fixed look) */
-    .bottom-input {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: #0b0b14;
-        padding: 20px;
-        border-top: 2px solid #ff66cc55;
-        box-shadow: 0 0 20px #ff33cc22;
-    }
-
-    /* Ensure main block container has padding so content is visible */
-    .block-container {
-        padding-bottom: 240px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 
 # def main():
 #     require_login()
 #     #apply_neon_theme()
 #     apply_anime_terminal_hacker_theme()
-#     apply_chat_layout_style()
 #     st.title("🤖 AI-Powered SQL Query Assistant")
 #     st.markdown("Ask questions in natural language, and I will generate SQL queries for you to review and run!")
 #     st.markdown("---")
@@ -637,9 +606,13 @@ def apply_chat_layout_style():
 def main():
     require_login()
     apply_anime_terminal_hacker_theme()
-    apply_chat_layout_style()
+    # ❌ don't call apply_chat_layout_style() anymore for this layout
 
     st.title("🤖 AI-Powered SQL Query Assistant")
+    st.markdown(
+        "Ask questions in natural language, and I will generate SQL queries for you to review and run!"
+    )
+    st.markdown("---")
 
     # ---------- SIDEBAR ----------
     st.sidebar.title("💡 Example Questions")
@@ -664,8 +637,8 @@ def main():
         🩼**How it works:**
         1. Enter your question in plain English  
         2. AI generates SQL query  
-        3. Review and optionally edit  
-        4. Click "Run Query"           
+        3. Review and optionally edit the SQL  
+        4. Query runs and results are shown in the chat           
     """)
     st.sidebar.markdown("---")
 
@@ -673,56 +646,76 @@ def main():
         st.session_state.logged_in = False
         st.rerun()
 
-    # ---------- SESSION ----------
+    # ---------- STATE ----------
     if "query_history" not in st.session_state:
-        st.session_state.query_history = []
+        st.session_state.query_history = []   # list of {question, sql, rows, df}
 
-    # ---------- CHAT DISPLAY AREA (TOP) ----------
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    # ---------- TABS ----------
+    tab_chat, tab_history = st.tabs(["💬 Chat", "📜 Query History"])
 
-    for item in st.session_state.query_history:
-        st.markdown(f"### 🧠 Question: {item['question']}")
-        st.code(item["sql"], language="sql")
+    # ========== TAB 1: CHAT (like GPT) ==========
+    with tab_chat:
+        # Render existing conversation
+        for item in st.session_state.query_history:
+            # User message
+            with st.chat_message("user"):
+                st.markdown(item["question"])
 
-        if item.get("df") is not None:
-            st.dataframe(item["df"], use_container_width=True)
+            # Assistant message (SQL + results)
+            with st.chat_message("assistant"):
+                st.markdown("**Generated SQL:**")
+                st.code(item["sql"], language="sql")
 
-        st.caption(f"Returned {item['rows']} rows")
-        st.markdown("---")
+                if item.get("df") is not None:
+                    st.markdown(f"**Rows returned:** `{item['rows']}`")
+                    st.dataframe(item["df"], use_container_width=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+        # Bottom input bar with arrow icon (Streamlit built-in)
+        user_question = st.chat_input("Ask something about your anime data...")
 
-    # ---------- BOTTOM INPUT BAR ----------
-    st.markdown('<div class="bottom-input">', unsafe_allow_html=True)
+        if user_question:
+            user_question = user_question.strip()
+            if user_question:
+                # Generate SQL
+                with st.spinner("🧠 Generating SQL..."):
+                    sql_query = generate_sql_with_gpt(user_question)
 
-    user_question = st.text_area(
-        "Ask something about anime:",
-        placeholder="Example: Show top anime by average user rating…",
-        key="chat_input",
-        height=80
-    )
+                df = None
+                rows = 0
+                if sql_query:
+                    # Run SQL
+                    with st.spinner("Executing SQL query..."):
+                        df = run_query(sql_query)
+                        if df is not None:
+                            rows = len(df)
 
-    send = st.button("Generate SQL", type="primary", key="send_button")
+                # Save to history and rerun to show it as chat
+                st.session_state.query_history.append(
+                    {
+                        "question": user_question,
+                        "sql": sql_query if sql_query else "",
+                        "rows": rows,
+                        "df": df,
+                    }
+                )
+                st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # ========== TAB 2: QUERY HISTORY ==========
+    with tab_history:
+        st.subheader("📜 Query History")
 
-    # ---------- HANDLE GENERATION ----------
-    if send and user_question.strip():
-        q = user_question.strip()
+        if not st.session_state.query_history:
+            st.info("No queries yet. Ask something in the **Chat** tab first.")
+        else:
+            for idx, item in enumerate(reversed(st.session_state.query_history), start=1):
+                label = f"Q{len(st.session_state.query_history) - idx + 1}: {item['question'][:70]}..."
+                with st.expander(label):
+                    st.markdown(f"**Question:** {item['question']}")
+                    st.code(item["sql"], language="sql")
+                    st.caption(f"Returned `{item['rows']}` rows")
 
-        with st.spinner("🧠 Generating SQL..."):
-            sql_query = generate_sql_with_gpt(q)
-
-        df = None
-        if sql_query:
-            with st.spinner("Running SQL query..."):
-                df = run_query(sql_query)
-
-        st.session_state.query_history.append({
-            "question": q,
-            "sql": sql_query,
-            "rows": 0 if df is None else len(df),
-            "df": df
-        })
-
-        st.rerun()
+                    # Optional re-run button inside history
+                    if st.button("Re-run this query", key=f"rerun_{idx}"):
+                        df = run_query(item["sql"])
+                        if df is not None:
+                            st.dataframe(df, use_container_width=True)
