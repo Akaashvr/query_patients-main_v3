@@ -270,139 +270,88 @@ def generate_sql_with_gpt(user_question):
 
 def apply_neon_theme():
     st.markdown("""
-        <style>
+    <style>
+    /* ... keep all your existing styles ABOVE this ... */
 
-        /* GLOBAL BACKGROUND */
-        .stApp {
-            background-color: #0a0f1f !important;
-            color: #e6e6e6 !important;
-            font-family: 'JetBrains Mono', monospace !important;
-        }
+    /* === CHAT INPUT: centered neon pill, clean layout === */
+    div[data-testid="stChatInput"] {
+        position: fixed;
+        bottom: 22px;                /* lift a bit from bottom */
+        left: 0;
+        right: 0;
+        padding: 0;
+        background: transparent;
+        z-index: 9999;
+    }
 
-        /* SCROLLBAR */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #11ffee44;
-            border-radius: 10px;
-        }
+    /* Outer pill container */
+    div[data-testid="stChatInput"] > div {
+        max-width: 820px;            /* overall width of bar */
+        margin: 0 auto;
+        padding: 3px;                /* thin outer glow padding */
+        border-radius: 999px;
+        background: linear-gradient(
+            90deg,
+            #11ffeeaa,
+            #11f7ffcc,
+            #7f5dffcc
+        );                           /* neon gradient border */
+    }
 
-        /* HEADERS */
-        h1, h2, h3, h4 {
-            font-family: 'JetBrains Mono', monospace !important;
-            color: #11f7ff !important;
-            text-shadow: 0 0 10px #11ffeeaa;
-        }
+    /* Inner dark track */
+    div[data-testid="stChatInput"] > div > div {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 999px;
+        background: #151a28f0;
+        padding: 0.25rem 0.5rem 0.25rem 0.85rem;
+    }
 
-        /* SIDEBAR */
-        section[data-testid="stSidebar"] {
-            background-color: #0d1229 !important;
-            border-right: 1px solid #11ffef33;
-        }
+    /* Text area */
+    div[data-testid="stChatInput"] textarea {
+        flex: 1;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        resize: none !important;
+        min-height: 1.8rem !important;
+        max-height: 2.4rem !important;
+        padding: 0.2rem 0.2rem !important;
+        font-size: 0.9rem !important;
+        color: #e6f7ff !important;
+    }
 
-        /* BUTTONS */
-        div.stButton > button {
-            background-color: #0b132b;
-            border: 1px solid #11ffeeaa;
-            color: #11f7ff;
-            padding: 0.6rem 1rem;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
+    /* Placeholder color */
+    div[data-testid="stChatInput"] textarea::placeholder {
+        color: #a8b3c7 !important;
+    }
 
-        div.stButton > button:hover {
-            background-color: #11ffee22;
-            color: white;
-            border-color: #11ffee;
-            box-shadow: 0 0 15px #11ffeeaa;
-        }
+    /* Send button (arrow) */
+    div[data-testid="stChatInput"] button {
+        flex: 0 0 auto;
+        border-radius: 999px !important;
+        border: none !important;
+        background: radial-gradient(circle at 30% 30%, #ffffff, #11ffeeee) !important;
+        color: #08111f !important;
+        padding: 0.2rem 0.9rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 700;
+        box-shadow: 0 0 10px #11ffee88;
+    }
 
-        /* TEXT AREA + INPUTS */
-        textarea, input {
-            background-color: #111729 !important;
-            color: #c0faff !important;
-            border-radius: 6px !important;
-            border: 1px solid #11ffee44 !important;
-        }
+    div[data-testid="stChatInput"] button:hover {
+        box-shadow: 0 0 16px #11ffeecc;
+        transform: translateY(-1px);
+    }
 
-        /* DATAFRAME TABLE */
-        .stDataFrame, .dataframe {
-            background-color: #0d1229 !important;
-            color: #c6f7ff !important;
-            border: 1px solid #11ffee33 !important;
-        }
-
-        /* EXPANDERS */
-        .streamlit-expanderHeader {
-            color: #11f7ff !important;
-            font-weight: bold;
-            text-shadow: 0 0 5px #11ffee;
-        }
-
-        /* INFO BOXES */
-        .stAlert {
-            background-color: #112033 !important;
-            border-left: 3px solid #11ffeeaa !important;
-            color: #c6faff !important;
-        }
-
-        /* === FIX CHAT INPUT AT BOTTOM (GPT-style) === */
-        /* === CHAT INPUT: centered, shorter, GPT-style pill === */
-div[data-testid="stChatInput"] {
-    position: fixed;
-    bottom: 20px;          /* a bit higher from the very bottom */
-    left: 0;
-    right: 0;
-    padding: 0;            /* no outer padding, we style inner div */
-    background: transparent;
-    z-index: 9999;
-}
-
-/* Inner wrapper that actually looks like the bar */
-div[data-testid="stChatInput"] > div {
-    max-width: 850px;                          /* shorter width */
-    margin: 0 auto;                            /* centered */
-    background: #050814f2;                     /* dark pill */
-    border-radius: 999px;
-    border: 1px solid #11ffee88;
-    padding: 0.2rem 0.75rem;
-    display: flex;
-    align-items: center;
-}
-
-/* Text area inside the chat input */
-div[data-testid="stChatInput"] textarea {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    min-height: 1.8rem !important;             /* shorter height */
-    max-height: 2.6rem !important;
-    padding: 0.35rem 0.4rem !important;
-    font-size: 0.9rem !important;
-}
-
-/* Send button (the arrow) */
-div[data-testid="stChatInput"] button {
-    background-color: #11ffee33 !important;
-    border-radius: 999px !important;
-    border: 1px solid #11ffeeaa !important;
-    color: #e6faff !important;
-    padding: 0.1rem 0.9rem !important;
-    font-size: 0.9rem !important;
-}
-div[data-testid="stChatInput"] button:hover {
-    background-color: #11ffee66 !important;
-}
-
-/* Give content some room so it doesn't hide behind the chat bar */
-.block-container {
-    padding-bottom: 140px !important;
-}
-
-        </style>
+    /* Make room so content doesn't hide behind chat input */
+    .block-container {
+        padding-bottom: 150px !important;
+    }
+    </style>
     """, unsafe_allow_html=True)
+
 
 
 # def main():
