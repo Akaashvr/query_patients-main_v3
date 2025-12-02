@@ -180,17 +180,34 @@ def get_db_url():
 DATABASE_URL = get_db_url()
 
 
-@st.cache_resource
-def get_db_connection():
+# @st.cache_resource
+# def get_db_connection():
 
-    """Create and cache database connection."""
+#     """Create and cache database connection."""
+#     try:
+#         conn = psycopg2.connect(DATABASE_URL)
+#         return conn
+#     except Exception as e:
+#         st.error(f"Failed to connect to database: {e}")
+#         return None
+    
+def get_db_connection():
+    if 'db_conn' in st.session_state:
+        try:
+            st.session_state.db_conn.cursor().execute("SELECT 1;")
+            return st.session_state.db_conn
+        except:
+            st.session_state.db_conn = None
+
+    # connect fresh
     try:
         conn = psycopg2.connect(DATABASE_URL)
+        st.session_state.db_conn = conn
         return conn
     except Exception as e:
         st.error(f"Failed to connect to database: {e}")
         return None
-    
+
 def run_query(sql):
     """Execute SQL query and return results as DataFrame."""
     conn = get_db_connection()
