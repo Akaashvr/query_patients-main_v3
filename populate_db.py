@@ -528,9 +528,13 @@ if __name__ == "__main__":
     # Create tables
     print("Creating tables...")
     conn = psycopg2.connect(DATABASE_URL)
+    print("Connected to DB")
     cursor = conn.cursor()
+    print("About to execute STAGING_CREATE_SQL")
     cursor.execute(STAGING_CREATE_SQL)
+    print("Finished executing STAGING_CREATE_SQL, about to commit")
     conn.commit()
+    print("Commit done")
     cursor.close()
     conn.close()
     print("Tables created successfully\n")
