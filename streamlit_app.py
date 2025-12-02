@@ -542,21 +542,22 @@ def main():
     if "typewriter_done" not in st.session_state:
         st.session_state.typewriter_done = True
 
-    # ---------- TABS ----------
+    # ---------- TABS ----------    
+    top_col1, top_col2 = st.columns([3, 1])
+    with top_col2:
+        if st.button("🧹 Clear History"):
+            st.session_state.query_history = []
+            st.session_state.current_question = None
+            st.session_state.generated_sql = None
+            st.session_state.last_df = None
+            st.session_state.last_rows = 0
+            st.session_state.typewriter_done = True
+            st.rerun()
     tab_chat, tab_history = st.tabs(["💬 Chat", "📜 Query History"])
 
     # ========== TAB 1: CHAT ==========
     with tab_chat:
-        top_col1, top_col2 = st.columns([3, 1])
-        with top_col2:
-            if st.button("🧹 Clear History"):
-                st.session_state.query_history = []
-                st.session_state.current_question = None
-                st.session_state.generated_sql = None
-                st.session_state.last_df = None
-                st.session_state.last_rows = 0
-                st.session_state.typewriter_done = True
-                st.rerun()
+        
 
         # ----- GENERATED BLOCK (question + SQL, scrollable area) -----
         user_sql = None  # will hold whatever is in the editor
