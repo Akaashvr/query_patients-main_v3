@@ -62,7 +62,7 @@ A060	Demon Slayer: Mugen Train	Movie	1	Finished	2020-10-16	2020-10-16	Manga	Ufot
 A061	Barakamon	TV	12	Finished	2014-07-06	2014-09-28	Manga	Kinema Citrus	PG-13	8.35	61
 A062	March Comes in Like a Lion	TV	22	Finished	2016-10-08	2017-03-18	Manga	Shaft	PG-13	8.40	62
 A063	March Comes in Like a Lion 2nd Season	TV	22	Finished	2017-10-14	2018-03-31	Manga	Shaft	PG-13	8.85	63
-A064	3-gatsu Short Stories	TV	3	Finished	2017-	2017-	Original	Shaft	PG-13	7.40	64
+A064	3-gatsu Short Stories	TV	3	Finished	2016-10-08	2018-03-31	Original	Shaft	PG-13	7.40	64
 A065	Assassination Classroom	TV	22	Finished	2015-01-10	2015-06-20	Manga	Lerche	PG-13	8.10	65
 A066	Assassination Classroom 2nd Season	TV	25	Finished	2016-01-08	2016-06-30	Manga	Lerche	PG-13	8.60	66
 A067	Konohana Kitan	TV	12	Finished	2017-10-04	2017-12-20	Manga	Lerche	PG-13	7.50	67

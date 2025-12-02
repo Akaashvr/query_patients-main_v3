@@ -279,7 +279,15 @@ def load_tsv_to_stage(conn, filepath, stage_table, expected_columns, batch_size=
         log_template = "Inserted another batch of {:,} rows; total: {:,}"
 
         for row in csv_reader:
-            rows.append([row.get(c, None) for c in expected_columns])
+            #rows.append([row.get(c, None) for c in expected_columns])
+            cleaned_row = []
+            for c in expected_columns:
+                val = row.get(c, None)
+                if val is not None and val.strip() == "":
+                    val = None
+                cleaned_row.append(val)
+            rows.append(cleaned_row)
+
             row_count += 1
 
             if row_count == batch_size:
