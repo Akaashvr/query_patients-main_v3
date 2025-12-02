@@ -10,11 +10,27 @@ from utils import get_db_url
 
 STAGING_CREATE_SQL = """
 -- Drop existing tables if they exist (facts -> cores -> dimensions -> staging)
+
+DROP TABLE IF EXISTS admission_lab_results CASCADE;
+DROP TABLE IF EXISTS admission_primary_diagnoses CASCADE;
+DROP TABLE IF EXISTS admissions CASCADE;
+DROP TABLE IF EXISTS diagnosis_codes CASCADE;
+DROP TABLE IF EXISTS lab_tests CASCADE;
+DROP TABLE IF EXISTS lab_units CASCADE;
+DROP TABLE IF EXISTS languages CASCADE;
+DROP TABLE IF EXISTS marital_statuses CASCADE;
+DROP TABLE IF EXISTS patients CASCADE;
+DROP TABLE IF EXISTS races CASCADE;
+DROP TABLE IF EXISTS stage_admissions CASCADE;
+DROP TABLE IF EXISTS stage_diagnoses CASCADE;
+DROP TABLE IF EXISTS stage_labs CASCADE;
+DROP TABLE IF EXISTS stage_patients CASCADE;
+
+
 DROP TABLE IF EXISTS user_anime_ratings CASCADE;
 DROP TABLE IF EXISTS anime_genres CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS anime CASCADE;
-
 DROP TABLE IF EXISTS anime_types CASCADE;
 DROP TABLE IF EXISTS anime_statuses CASCADE;
 DROP TABLE IF EXISTS studios CASCADE;
@@ -25,7 +41,6 @@ DROP TABLE IF EXISTS countries CASCADE;
 DROP TABLE IF EXISTS age_groups CASCADE;
 DROP TABLE IF EXISTS genders CASCADE;
 DROP TABLE IF EXISTS watch_statuses CASCADE;
-
 DROP TABLE IF EXISTS stage_anime CASCADE;
 DROP TABLE IF EXISTS stage_genres CASCADE;
 DROP TABLE IF EXISTS stage_users CASCADE;
