@@ -1,11 +1,101 @@
 AnimeID	AnimeTitle	Type	Episodes	Status	StartDate	EndDate	Source	StudioName	RatingCategory	OverallScore	PopularityRank
 A001	Fullmetal Alchemist: Brotherhood	TV	64	Finished	2009-04-05	2010-07-04	Manga	Bones	R	9.15	1
-A002	Attack on Titan	TV	75	Finished	2013-04-07	2021-03-29	Manga	MAPPA	R	9.05	2
-A003	Demon Slayer: Kimetsu no Yaiba	TV	26	Finished	2019-04-06	2019-09-28	Manga	Ufotable	R	8.90	3
-A004	Jujutsu Kaisen	TV	24	Finished	2020-10-03	2021-03-27	Manga	MAPPA	R	8.75	4
-A005	Spirited Away	Movie	1	Finished	2001-07-20	2001-07-20	Original	Studio Ghibli	PG	8.90	5
-A006	Your Name	Movie	1	Finished	2016-08-26	2016-08-26	Original	CoMix Wave Films	PG-13	8.85	6
-A007	My Hero Academia	TV	88	Finished	2016-04-03	2021-09-25	Manga	Bones	PG-13	8.10	7
-A008	Haikyuu!!	TV	85	Finished	2014-04-06	2020-12-19	Manga	Production I.G	PG-13	8.70	8
-A009	One Punch Man	TV	24	Finished	2015-10-05	2019-07-03	Webcomic	Madhouse	PG-13	8.55	9
-A010	Violet Evergarden	TV	13	Finished	2018-01-11	2018-04-05	Light Novel	Kyoto Animation	PG-13	8.60	10
+A002	Attack on Titan	TV	75	Finished	2013-04-07	2021-03-29	Manga	MAPPA	R	9.08	2
+A003	One Piece	TV	1100	Ongoing	1999-10-20		 Manga	Toei Animation	PG-13	8.80	3
+A004	Demon Slayer: Kimetsu no Yaiba	TV	26	Finished	2019-04-06	2019-09-28	Manga	Ufotable	R	8.85	4
+A005	Jujutsu Kaisen	TV	24	Ongoing	2020-10-03		Manga	MAPPA	R	8.75	5
+A006	Steins;Gate	TV	24	Finished	2011-04-06	2011-09-14	Visual Novel	White Fox	PG-13	9.05	6
+A007	Death Note	TV	37	Finished	2006-10-04	2007-06-27	Manga	Madhouse	R	8.70	7
+A008	Fullmetal Alchemist (2003)	TV	51	Finished	2003-10-04	2004-10-02	Manga	Bones	PG-13	8.15	8
+A009	Hunter x Hunter (2011)	TV	148	Finished	2011-10-02	2014-09-24	Manga	Madhouse	PG-13	9.00	9
+A010	My Hero Academia	TV	113	Ongoing	2016-04-03		Manga	Bones	PG-13	8.10	10
+A011	Haikyuu!!	TV	85	Finished	2014-04-06	2020-12-19	Manga	Production I.G	PG-13	8.70	11
+A012	Violet Evergarden	TV	13	Finished	2018-01-11	2018-04-05	Light Novel	Kyoto Animation	PG-13	8.65	12
+A013	Sword Art Online	TV	25	Finished	2012-07-08	2012-12-23	Light Novel	A-1 Pictures	PG-13	7.70	13
+A014	Tokyo Ghoul	TV	12	Finished	2014-07-04	2014-09-19	Manga	Pierrot	R	7.90	14
+A015	Your Lie in April	TV	22	Finished	2014-10-10	2015-03-20	Manga	A-1 Pictures	PG-13	8.70	15
+A016	Code Geass: Lelouch of the Rebellion	TV	25	Finished	2006-10-06	2007-07-29	Original	Sunrise	R	8.80	16
+A017	Code Geass: Lelouch of the Rebellion R2	TV	25	Finished	2008-04-06	2008-09-28	Original	Sunrise	R	8.90	17
+A018	Gintama	TV	201	Finished	2006-04-04	2010-03-25	Manga	Sunrise	PG-13	8.95	18
+A019	Gintama°	TV	51	Finished	2015-04-08	2016-03-30	Manga	Bandai Namco Pictures	PG-13	9.05	19
+A020	Mob Psycho 100	TV	12	Finished	2016-07-12	2016-09-27	Webcomic	Bones	PG-13	8.55	20
+A021	Mob Psycho 100 II	TV	13	Finished	2019-01-07	2019-04-01	Webcomic	Bones	PG-13	8.80	21
+A022	Chainsaw Man	TV	12	Finished	2022-10-12	2022-12-28	Manga	MAPPA	R	8.50	22
+A023	Spy x Family	TV	25	Ongoing	2022-04-09		Manga	Wit Studio	PG-13	8.50	23
+A024	Ranking of Kings	TV	23	Finished	2021-10-15	2022-03-25	Original	Wit Studio	PG-13	8.60	24
+A025	Blue Lock	TV	24	Ongoing	2022-10-09		Manga	Eight Bit	PG-13	8.30	25
+A026	Kaguya-sama: Love is War	TV	12	Finished	2019-01-12	2019-03-30	Manga	A-1 Pictures	PG-13	8.45	26
+A027	Kaguya-sama: Love is War?	TV	12	Finished	2020-04-11	2020-06-27	Manga	A-1 Pictures	PG-13	8.70	27
+A028	Kaguya-sama: Love is War -Ultra Romantic-	TV	13	Finished	2022-04-09	2022-06-25	Manga	A-1 Pictures	PG-13	8.90	28
+A029	Re:Zero − Starting Life in Another World	TV	25	Finished	2016-04-04	2016-09-19	Light Novel	White Fox	R	8.30	29
+A030	That Time I Got Reincarnated as a Slime	TV	24	Ongoing	2018-10-02		Light Novel	Eight Bit	PG-13	8.10	30
+A031	Konosuba: God's Blessing on This Wonderful World!	TV	10	Finished	2016-01-14	2016-03-16	Light Novel	Studio Deen	PG-13	8.10	31
+A032	Konosuba 2	TV	10	Finished	2017-01-12	2017-03-16	Light Novel	Studio Deen	PG-13	8.30	32
+A033	No Game No Life	TV	12	Finished	2014-04-09	2014-06-25	Light Novel	Madhouse	PG-13	8.25	33
+A034	Overlord	TV	13	Ongoing	2015-07-07		Light Novel	Madhouse	R	7.95	34
+A035	Overlord II	TV	13	Finished	2018-01-09	2018-04-03	Light Novel	Madhouse	R	8.00	35
+A036	Overlord III	TV	13	Finished	2018-07-10	2018-10-02	Light Novel	Madhouse	R	8.05	36
+A037	One Punch Man	TV	12	Finished	2015-10-05	2015-12-21	Webcomic	Madhouse	PG-13	8.60	37
+A038	One Punch Man 2nd Season	TV	12	Finished	2019-04-10	2019-07-03	Webcomic	J.C.Staff	PG-13	7.45	38
+A039	Black Clover	TV	170	Finished	2017-10-03	2021-03-30	Manga	Pierrot	PG-13	7.95	39
+A040	Dr. Stone	TV	24	Finished	2019-07-05	2019-12-13	Manga	TMS Entertainment	PG-13	8.20	40
+A041	Dr. Stone: Stone Wars	TV	11	Finished	2021-01-14	2021-03-25	Manga	TMS Entertainment	PG-13	8.30	41
+A042	The Promised Neverland	TV	12	Finished	2019-01-11	2019-03-29	Manga	CloverWorks	R	8.55	42
+A043	Made in Abyss	TV	13	Finished	2017-07-07	2017-09-29	Manga	Kinema Citrus	R	8.80	43
+A044	Parasyte: The Maxim	TV	24	Finished	2014-10-09	2015-03-26	Manga	Madhouse	R	8.40	44
+A045	Erased	TV	12	Finished	2016-01-08	2016-03-25	Manga	A-1 Pictures	PG-13	8.35	45
+A046	Horimiya	TV	13	Finished	2021-01-10	2021-04-04	Manga	CloverWorks	PG-13	8.20	46
+A047	Toradora!	TV	25	Finished	2008-10-02	2009-03-26	Light Novel	J.C.Staff	PG-13	8.20	47
+A048	Clannad	TV	23	Finished	2007-10-05	2008-03-27	Visual Novel	Kyoto Animation	PG-13	8.00	48
+A049	Clannad: After Story	TV	24	Finished	2008-10-03	2009-03-27	Visual Novel	Kyoto Animation	PG-13	9.00	49
+A050	Angel Beats!	TV	13	Finished	2010-04-03	2010-06-26	Original	P.A. Works	PG-13	8.00	50
+A051	Your Name	Movie	1	Finished	2016-08-26	2016-08-26	Original	CoMix Wave Films	PG-13	8.85	51
+A052	Weathering With You	Movie	1	Finished	2019-07-19	2019-07-19	Original	CoMix Wave Films	PG-13	8.20	52
+A053	Spirited Away	Movie	1	Finished	2001-07-20	2001-07-20	Original	Studio Ghibli	PG	8.90	53
+A054	Princess Mononoke	Movie	1	Finished	1997-07-12	1997-07-12	Original	Studio Ghibli	PG-13	8.75	54
+A055	Howl's Moving Castle	Movie	1	Finished	2004-11-20	2004-11-20	Novel	Studio Ghibli	PG	8.65	55
+A056	Nausicaä of the Valley of the Wind	Movie	1	Finished	1984-03-11	1984-03-11	Manga	Topcraft	PG	8.30	56
+A057	Grave of the Fireflies	Movie	1	Finished	1988-04-16	1988-04-16	Novel	Studio Ghibli	R	8.50	57
+A058	A Silent Voice	Movie	1	Finished	2016-09-17	2016-09-17	Manga	Kyoto Animation	PG-13	8.90	58
+A059	I Want to Eat Your Pancreas	Movie	1	Finished	2018-09-01	2018-09-01	Novel	Studio VOLN	PG-13	8.50	59
+A060	Demon Slayer: Mugen Train	Movie	1	Finished	2020-10-16	2020-10-16	Manga	Ufotable	R	8.60	60
+A061	Barakamon	TV	12	Finished	2014-07-06	2014-09-28	Manga	Kinema Citrus	PG-13	8.35	61
+A062	March Comes in Like a Lion	TV	22	Finished	2016-10-08	2017-03-18	Manga	Shaft	PG-13	8.40	62
+A063	March Comes in Like a Lion 2nd Season	TV	22	Finished	2017-10-14	2018-03-31	Manga	Shaft	PG-13	8.85	63
+A064	3-gatsu Short Stories	TV	3	Finished	2017-	2017-	Original	Shaft	PG-13	7.40	64
+A065	Assassination Classroom	TV	22	Finished	2015-01-10	2015-06-20	Manga	Lerche	PG-13	8.10	65
+A066	Assassination Classroom 2nd Season	TV	25	Finished	2016-01-08	2016-06-30	Manga	Lerche	PG-13	8.60	66
+A067	Konohana Kitan	TV	12	Finished	2017-10-04	2017-12-20	Manga	Lerche	PG-13	7.50	67
+A068	Fruits Basket (2019)	TV	25	Finished	2019-04-06	2019-09-21	Manga	TMS Entertainment	PG-13	8.35	68
+A069	Fruits Basket: The Final	TV	13	Finished	2021-04-06	2021-06-29	Manga	TMS Entertainment	PG-13	9.00	69
+A070	Chihayafuru	TV	25	Finished	2011-10-05	2012-03-28	Manga	Madhouse	PG-13	8.10	70
+A071	Chihayafuru 2	TV	25	Finished	2013-01-12	2013-06-29	Manga	Madhouse	PG-13	8.40	71
+A072	Chihayafuru 3	TV	24	Finished	2019-10-22	2020-03-24	Manga	Madhouse	PG-13	8.60	72
+A073	Tengen Toppa Gurren Lagann	TV	27	Finished	2007-04-01	2007-09-30	Original	Gainax	PG-13	8.70	73
+A074	Kill la Kill	TV	24	Finished	2013-10-04	2014-03-28	Original	Trigger	R	8.10	74
+A075	Fire Force	TV	24	Finished	2019-07-06	2019-12-28	Manga	David Production	PG-13	7.75	75
+A076	Fire Force Season 2	TV	24	Finished	2020-07-04	2020-12-12	Manga	David Production	PG-13	7.90	76
+A077	Blue Exorcist	TV	25	Finished	2011-04-17	2011-10-02	Manga	A-1 Pictures	PG-13	7.50	77
+A078	Blue Exorcist: Kyoto Saga	TV	12	Finished	2017-01-07	2017-03-25	Manga	A-1 Pictures	PG-13	7.75	78
+A079	Noragami	TV	12	Finished	2014-01-05	2014-03-23	Manga	Bones	PG-13	7.95	79
+A080	Noragami Aragoto	TV	13	Finished	2015-10-03	2015-12-26	Manga	Bones	PG-13	8.15	80
+A081	Ancient Magus' Bride	TV	24	Finished	2017-10-07	2018-03-24	Manga	Wit Studio	PG-13	8.10	81
+A082	Saga of Tanya the Evil	TV	12	Finished	2017-01-06	2017-03-31	Light Novel	NUT	R	7.95	82
+A083	Akame ga Kill!	TV	24	Finished	2014-07-07	2014-12-15	Manga	White Fox	R	7.55	83
+A084	Psycho-Pass	TV	22	Finished	2012-10-12	2013-03-22	Original	Production I.G	R	8.30	84
+A085	Psycho-Pass 2	TV	11	Finished	2014-10-10	2014-12-19	Original	Tatsunoko Production	R	7.50	85
+A086	Vivy: Fluorite Eye's Song	TV	13	Finished	2021-04-03	2021-06-19	Original	Wit Studio	PG-13	8.50	86
+A087	86 Eighty-Six	TV	23	Finished	2021-04-11	2022-03-19	Light Novel	A-1 Pictures	R	8.30	87
+A088	The Rising of the Shield Hero	TV	25	Finished	2019-01-09	2019-06-26	Light Novel	Kinema Citrus	PG-13	7.90	88
+A089	Jobless Reincarnation	TV	23	Finished	2021-01-11	2021-12-20	Light Novel	Studio Bind	R	8.45	89
+A090	Oregairu	TV	13	Finished	2013-04-05	2013-06-28	Light Novel	Brain's Base	PG-13	8.00	90
+A091	Oregairu Zoku	TV	13	Finished	2015-04-03	2015-06-26	Light Novel	Feel	PG-13	8.20	91
+A092	Oregairu Kan	TV	12	Finished	2020-07-10	2020-09-25	Light Novel	Feel	PG-13	8.50	92
+A093	Monogatari Series: Second Season	TV	26	Finished	2013-07-07	2013-12-29	Light Novel	Shaft	R	8.70	93
+A094	Bakemonogatari	TV	15	Finished	2009-07-03	2010-06-25	Light Novel	Shaft	R	8.35	94
+A095	Serial Experiments Lain	TV	13	Finished	1998-07-06	1998-09-28	Original	Triangle Staff	R	8.00	95
+A096	Cowboy Bebop	TV	26	Finished	1998-04-03	1999-04-24	Original	Sunrise	R	8.85	96
+A097	Samurai Champloo	TV	26	Finished	2004-05-19	2005-03-19	Original	Manglobe	R	8.50	97
+A098	Neon Genesis Evangelion	TV	26	Finished	1995-10-04	1996-03-27	Original	Gainax	R	8.35	98
+A099	Beastars	TV	12	Finished	2019-10-10	2019-12-26	Manga	Orange	PG-13	7.90	99
+A100	Odd Taxi	TV	13	Finished	2021-04-06	2021-06-29	Original	OLM	PG-13	8.75	100
