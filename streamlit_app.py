@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import os
 import bcrypt
+import time
 
 
 load_dotenv()  # reads variables from a .env file and sets them in os.environ
@@ -535,6 +536,8 @@ def main():
         st.session_state.last_df = None
     if "last_rows" not in st.session_state:
         st.session_state.last_rows = 0
+    if "typewriter_done" not in st.session_state:
+        st.session_state.typewriter_done = True
 
     # ---------- TABS ----------
     tab_chat, tab_history = st.tabs(["💬 Chat", "📜 Query History"])
@@ -549,6 +552,8 @@ def main():
                 st.session_state.generated_sql = None
                 st.session_state.last_df = None
                 st.session_state.last_rows = 0
+                st.session_state.typewriter_done = True
+                st.session_state.pop("sql_editor", None)
                 st.rerun()
 
         # --- Generated SQL + Run button at the top ---
@@ -557,11 +562,27 @@ def main():
             st.subheader("🧠 Generated SQL Query")
             st.info(f"**Question:** {st.session_state.current_question}")
 
+            # TYPEWRITER DISPLAY
+            sql_text = st.session_state.generated_sql or ""
+            if not st.session_state.typewriter_done:
+                placeholder = st.empty()
+                typed = ""
+                for ch in sql_text:
+                    typed += ch
+                    placeholder.code(typed, language="sql")
+                    time.sleep(0.01)
+                st.session_state.typewriter_done = True
+            else:
+                st.code(sql_text, language="sql")
+
+            # Editable SQL area
+            if "sql_editor" not in st.session_state:
+                st.session_state.sql_editor = sql_text
+
             edited_sql = st.text_area(
                 "Review and edit the SQL query if needed:",
-                value=st.session_state.generated_sql,
-                height=200,
                 key="sql_editor",
+                height=200,
             )
 
             run_button = st.button(
@@ -569,8 +590,9 @@ def main():
             )
 
             if run_button:
+                sql_to_run = st.session_state.get("sql_editor", sql_text)
                 with st.spinner("Executing query ..."):
-                    df = run_query(edited_sql)
+                    df = run_query(sql_to_run)
                 if df is not None:
                     st.session_state.last_df = df
                     st.session_state.last_rows = len(df)
@@ -579,7 +601,7 @@ def main():
                     st.session_state.query_history.append(
                         {
                             "question": st.session_state.current_question,
-                            "sql": edited_sql,
+                            "sql": sql_to_run,
                             "rows": len(df),
                             "df": df,
                         }
@@ -604,9 +626,11 @@ def main():
                     sql_query = generate_sql_with_gpt(q)
 
                 st.session_state.current_question = q
-                st.session_state.generated_sql = sql_query
+                st.session_state.generated_sql = sql_query or ""
+                st.session_state.sql_editor = sql_query or ""
                 st.session_state.last_df = None
                 st.session_state.last_rows = 0
+                st.session_state.typewriter_done = False
                 st.rerun()
 
     # ========== TAB 2: QUERY HISTORY ==========
