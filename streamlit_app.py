@@ -348,6 +348,24 @@ def apply_neon_theme():
             color: #c6faff !important;
         }
 
+        /* === FIX CHAT INPUT AT BOTTOM (GPT-style) === */
+        div[data-testid="stChatInput"] {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.75rem 1.5rem 1rem 1.5rem;
+            background: #050814ee;
+            backdrop-filter: blur(6px);
+            border-top: 1px solid #11ffee44;
+            z-index: 9999;
+        }
+
+        /* Make room so content doesn't hide behind chat input */
+        .block-container {
+            padding-bottom: 140px !important;
+        }
+
         </style>
     """, unsafe_allow_html=True)
 
@@ -556,26 +574,69 @@ def main():
                 st.session_state.pop("sql_editor", None)
                 st.rerun()
 
-        # --- Generated SQL + Run button at the top ---
+        # ----- GENERATED BLOCK (SCROLLABLE AREA) -----
+        # This whole section scrolls; bottom bar stays fixed via CSS.
         if st.session_state.generated_sql:
             st.markdown("---")
             st.subheader("🧠 Generated SQL Query")
-            st.info(f"**Question:** {st.session_state.current_question}")
 
-            # TYPEWRITER DISPLAY
+            question_text = st.session_state.current_question or ""
             sql_text = st.session_state.generated_sql or ""
+
+            # Placeholders so we can animate question + SQL
+            q_placeholder = st.empty()
+            sql_placeholder = st.empty()
+
             if not st.session_state.typewriter_done:
-                placeholder = st.empty()
-                typed = ""
-                for ch in sql_text:
-                    typed += ch
-                    placeholder.code(typed, language="sql")
+                # Typewriter for the QUESTION
+                typed_q = ""
+                for ch in question_text:
+                    typed_q += ch
+                    q_placeholder.markdown(
+                        f"""
+                        <div style="
+                            background:#0b223f;
+                            padding:0.6rem 0.9rem;
+                            border-radius:0.5rem;
+                            border-left:3px solid #11ffeeaa;
+                            font-weight:500;
+                            color:#e6f2ff;">
+                            <span style="color:#7fd8ff;">Question:</span>
+                            <span style="color:#ffffff;"> {typed_q}</span>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
                     time.sleep(0.01)
+
+                # Typewriter for the SQL
+                typed_sql = ""
+                for ch in sql_text:
+                    typed_sql += ch
+                    sql_placeholder.code(typed_sql, language="sql")
+                    time.sleep(0.01)
+
                 st.session_state.typewriter_done = True
             else:
-                st.code(sql_text, language="sql")
+                # Static display once animation has run
+                q_placeholder.markdown(
+                    f"""
+                    <div style="
+                        background:#0b223f;
+                        padding:0.6rem 0.9rem;
+                        border-radius:0.5rem;
+                        border-left:3px solid #11ffeeaa;
+                        font-weight:500;
+                        color:#e6f2ff;">
+                        <span style="color:#7fd8ff;">Question:</span>
+                        <span style="color:#ffffff;"> {question_text}</span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                sql_placeholder.code(sql_text, language="sql")
 
-            # Editable SQL area
+            # Editable SQL area (below typewriter)
             if "sql_editor" not in st.session_state:
                 st.session_state.sql_editor = sql_text
 
@@ -597,10 +658,10 @@ def main():
                     st.session_state.last_df = df
                     st.session_state.last_rows = len(df)
 
-                    # save to history
+                    # Save to history
                     st.session_state.query_history.append(
                         {
-                            "question": st.session_state.current_question,
+                            "question": question_text,
                             "sql": sql_to_run,
                             "rows": len(df),
                             "df": df,
@@ -614,7 +675,7 @@ def main():
             st.subheader("📊 Query Results")
             st.dataframe(st.session_state.last_df, use_container_width=True)
 
-        # --- Input bar at the bottom with arrow icon (ChatGPT-style) ---
+        # ----- STATIC BOTTOM INPUT BAR (GPT-style) -----
         user_question = st.chat_input(
             "Ask something about your anime data (e.g., top 10 highest-rated anime)..."
         )
