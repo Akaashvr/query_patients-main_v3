@@ -472,8 +472,8 @@ def apply_anime_terminal_hacker_theme():
 
 def main():
     require_login()
-    #apply_neon_theme()
-    apply_anime_terminal_hacker_theme()
+    apply_neon_theme()
+    #apply_anime_terminal_hacker_theme()
     st.title("🤖 AI-Powered SQL Query Assistant")
     st.markdown("Ask questions in natural language, and I will generate SQL queries for you to review and run!")
     st.markdown("---")
