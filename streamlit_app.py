@@ -564,8 +564,6 @@ def main():
         st.session_state.last_rows = 0
     if "typewriter_done" not in st.session_state:
         st.session_state.typewriter_done = True
-    if "sql_editor" not in st.session_state:
-        st.session_state.sql_editor = ""
 
     # ---------- TABS ----------
     tab_chat, tab_history = st.tabs(["💬 Chat", "📜 Query History"])
@@ -581,10 +579,11 @@ def main():
                 st.session_state.last_df = None
                 st.session_state.last_rows = 0
                 st.session_state.typewriter_done = True
-                st.session_state.sql_editor = ""
                 st.rerun()
 
-        # ----- GENERATED BLOCK (question + SQL) -----
+        # ----- GENERATED BLOCK (question + SQL, scrollable area) -----
+        user_sql = None  # will hold whatever is in the editor
+
         if st.session_state.generated_sql:
             st.markdown("---")
             st.subheader("🧠 Generated SQL Query")
@@ -592,10 +591,14 @@ def main():
             question_text = st.session_state.current_question or ""
             full_sql = st.session_state.generated_sql or ""
 
+            # Question placeholder
             q_placeholder = st.empty()
 
+            # SQL editor placeholder
+            sql_editor_placeholder = st.empty()
+
             if not st.session_state.typewriter_done:
-                # Typewriter for the QUESTION
+                # --- Typewriter for QUESTION ---
                 typed_q = ""
                 for ch in question_text:
                     typed_q += ch
@@ -616,15 +619,12 @@ def main():
                     )
                     time.sleep(0.01)
 
-                # Typewriter for the SQL inside a SINGLE textarea (no duplicate)
-                sql_placeholder = st.empty()
+                # --- Typewriter for SQL inside ONE editor ---
                 typed_sql = ""
                 for ch in full_sql:
                     typed_sql += ch
-                    st.session_state.sql_editor = typed_sql
-                    sql_placeholder.text_area(
+                    user_sql = sql_editor_placeholder.text_area(
                         "Review and edit the SQL query if needed:",
-                        key="sql_editor",
                         value=typed_sql,
                         height=180,
                     )
@@ -633,7 +633,7 @@ def main():
                 st.session_state.typewriter_done = True
 
             else:
-                # Static display after animation finished
+                # Static display (after animation is done)
                 q_placeholder.markdown(
                     f"""
                     <div style="
@@ -650,20 +650,19 @@ def main():
                     unsafe_allow_html=True,
                 )
 
-                st.session_state.sql_editor = st.session_state.sql_editor or full_sql
-                st.text_area(
+                user_sql = sql_editor_placeholder.text_area(
                     "Review and edit the SQL query if needed:",
-                    key="sql_editor",
+                    value=full_sql,
                     height=180,
                 )
 
-            # Run Query button (only one copy of SQL – from sql_editor)
+            # --- Run Query button (uses the SINGLE editor content) ---
             run_button = st.button(
                 "▶ Run Query", type="primary", use_container_width=True
             )
 
             if run_button:
-                sql_to_run = st.session_state.sql_editor
+                sql_to_run = user_sql or full_sql
                 with st.spinner("Executing query ..."):
                     df = run_query(sql_to_run)
 
@@ -699,7 +698,6 @@ def main():
 
                 st.session_state.current_question = q
                 st.session_state.generated_sql = sql_query or ""
-                st.session_state.sql_editor = sql_query or ""
                 st.session_state.last_df = None
                 st.session_state.last_rows = 0
                 st.session_state.typewriter_done = False
