@@ -1,0 +1,24 @@
+AnimeID	GenreName
+A001	Action
+A001	Adventure
+A001	Fantasy
+A002	Action
+A002	Drama
+A002	Military
+A003	Action
+A003	Demons
+A003	Historical
+A004	Action
+A004	Supernatural
+A005	Fantasy
+A005	Drama
+A006	Romance
+A006	Supernatural
+A007	Action
+A007	School
+A008	Sports
+A008	Comedy
+A009	Action
+A009	Comedy
+A010	Drama
+A010	Slice of Life

@@ -9,187 +9,233 @@ from utils import get_db_url
 
 
 STAGING_CREATE_SQL = """
--- Drop existing tables if they exist (in correct order due to foreign keys)
-DROP TABLE IF EXISTS admission_lab_results CASCADE;
-DROP TABLE IF EXISTS admission_primary_diagnoses CASCADE;
-DROP TABLE IF EXISTS admissions CASCADE;
-DROP TABLE IF EXISTS patients CASCADE;
-DROP TABLE IF EXISTS lab_tests CASCADE;
-DROP TABLE IF EXISTS diagnosis_codes CASCADE;
-DROP TABLE IF EXISTS lab_units CASCADE;
-DROP TABLE IF EXISTS languages CASCADE;
-DROP TABLE IF EXISTS marital_statuses CASCADE;
-DROP TABLE IF EXISTS races CASCADE;
+-- Drop existing tables if they exist (facts -> cores -> dimensions -> staging)
+DROP TABLE IF EXISTS user_anime_ratings CASCADE;
+DROP TABLE IF EXISTS anime_genres CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS anime CASCADE;
+
+DROP TABLE IF EXISTS anime_types CASCADE;
+DROP TABLE IF EXISTS anime_statuses CASCADE;
+DROP TABLE IF EXISTS studios CASCADE;
+DROP TABLE IF EXISTS sources CASCADE;
+DROP TABLE IF EXISTS rating_categories CASCADE;
+DROP TABLE IF EXISTS genres CASCADE;
+DROP TABLE IF EXISTS countries CASCADE;
+DROP TABLE IF EXISTS age_groups CASCADE;
 DROP TABLE IF EXISTS genders CASCADE;
-DROP TABLE IF EXISTS stage_labs CASCADE;
-DROP TABLE IF EXISTS stage_diagnoses CASCADE;
-DROP TABLE IF EXISTS stage_admissions CASCADE;
-DROP TABLE IF EXISTS stage_patients CASCADE;
+DROP TABLE IF EXISTS watch_statuses CASCADE;
 
+DROP TABLE IF EXISTS stage_anime CASCADE;
+DROP TABLE IF EXISTS stage_genres CASCADE;
+DROP TABLE IF EXISTS stage_users CASCADE;
+DROP TABLE IF EXISTS stage_ratings CASCADE;
+
+-- =========================
 -- Staging tables
-CREATE TABLE stage_patients (
-    PatientID                              TEXT, 
-    PatientGender                          TEXT, 
-    PatientDateOfBirth                     TIMESTAMP, 
-    PatientRace                            TEXT, 
-    PatientMaritalStatus                   TEXT, 
-    PatientLanguage                        TEXT, 
-    PatientPopulationPercentageBelowPoverty TEXT
+-- =========================
+
+CREATE TABLE stage_anime (
+    AnimeID        TEXT,
+    AnimeTitle     TEXT,
+    Type           TEXT,
+    Episodes       TEXT,
+    Status         TEXT,
+    StartDate      TIMESTAMP,
+    EndDate        TIMESTAMP,
+    Source         TEXT,
+    StudioName     TEXT,
+    RatingCategory TEXT,
+    OverallScore   TEXT,
+    PopularityRank TEXT
 );
 
-CREATE TABLE stage_admissions (
-    PatientID                              TEXT, 
-    AdmissionID                            TEXT, 
-    AdmissionStartDate                     TIMESTAMP, 
-    AdmissionEndDate                       TIMESTAMP
+CREATE TABLE stage_genres (
+    AnimeID    TEXT,
+    GenreName  TEXT
 );
 
-CREATE TABLE stage_diagnoses (
-    PatientID                              TEXT, 
-    AdmissionID                            TEXT, 
-    PrimaryDiagnosisCode                   TEXT, 
-    PrimaryDiagnosisDescription            TEXT
+CREATE TABLE stage_users (
+    UserID    TEXT,
+    UserName  TEXT,
+    Country   TEXT,
+    AgeGroup  TEXT,
+    Gender    TEXT
 );
 
-CREATE TABLE stage_labs (
-    PatientID                              TEXT, 
-    AdmissionID                            TEXT, 
-    LabName                                TEXT, 
-    LabValue                               TEXT,
-    LabUnits                               TEXT,
-    LabDateTime                            TIMESTAMP
+CREATE TABLE stage_ratings (
+    UserID      TEXT,
+    AnimeID     TEXT,
+    UserScore   TEXT,
+    RatingDate  TIMESTAMP,
+    WatchStatus TEXT
 );
 
--- Lookup tables
+-- =========================
+-- Dimension / lookup tables
+-- =========================
+
+CREATE TABLE anime_types (
+    type_id   SERIAL PRIMARY KEY,
+    type_name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE anime_statuses (
+    status_id   SERIAL PRIMARY KEY,
+    status_desc TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE studios (
+    studio_id   SERIAL PRIMARY KEY,
+    studio_name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE sources (
+    source_id   SERIAL PRIMARY KEY,
+    source_name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE rating_categories (
+    rating_category_id SERIAL PRIMARY KEY,
+    rating_code        TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE genres (
+    genre_id   SERIAL PRIMARY KEY,
+    genre_name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE countries (
+    country_id   SERIAL PRIMARY KEY,
+    country_name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE age_groups (
+    age_group_id    SERIAL PRIMARY KEY,
+    age_group_label TEXT NOT NULL UNIQUE
+);
+
 CREATE TABLE genders (
     gender_id   SERIAL PRIMARY KEY,
     gender_desc TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE races (
-    race_id     SERIAL PRIMARY KEY,
-    race_desc   TEXT NOT NULL UNIQUE
+CREATE TABLE watch_statuses (
+    watch_status_id SERIAL PRIMARY KEY,
+    status_desc     TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE marital_statuses (
-    marital_status_id   SERIAL PRIMARY KEY,
-    marital_status_desc TEXT NOT NULL UNIQUE
+-- =========================
+-- Core entity tables
+-- =========================
+
+CREATE TABLE anime (
+    anime_id            TEXT PRIMARY KEY,
+    title               TEXT NOT NULL,
+    type_id             INTEGER,
+    status_id           INTEGER,
+    episodes            INTEGER,
+    start_date          TIMESTAMP,
+    end_date            TIMESTAMP,
+    source_id           INTEGER,
+    studio_id           INTEGER,
+    rating_category_id  INTEGER,
+    overall_score       REAL,
+    popularity_rank     INTEGER,
+    FOREIGN KEY (type_id)            REFERENCES anime_types(type_id),
+    FOREIGN KEY (status_id)          REFERENCES anime_statuses(status_id),
+    FOREIGN KEY (source_id)          REFERENCES sources(source_id),
+    FOREIGN KEY (studio_id)          REFERENCES studios(studio_id),
+    FOREIGN KEY (rating_category_id) REFERENCES rating_categories(rating_category_id)
 );
 
-CREATE TABLE languages (
-    language_id SERIAL PRIMARY KEY,
-    language_desc TEXT NOT NULL UNIQUE
+CREATE TABLE users (
+    user_id      TEXT PRIMARY KEY,
+    user_name    TEXT NOT NULL,
+    country_id   INTEGER,
+    age_group_id INTEGER,
+    gender_id    INTEGER,
+    FOREIGN KEY (country_id)   REFERENCES countries(country_id),
+    FOREIGN KEY (age_group_id) REFERENCES age_groups(age_group_id),
+    FOREIGN KEY (gender_id)    REFERENCES genders(gender_id)
 );
 
-CREATE TABLE lab_units (
-    unit_id     SERIAL PRIMARY KEY,
-    unit_string TEXT NOT NULL UNIQUE
+-- =========================
+-- Fact tables
+-- =========================
+
+CREATE TABLE anime_genres (
+    anime_id TEXT NOT NULL,
+    genre_id INTEGER NOT NULL,
+    PRIMARY KEY (anime_id, genre_id),
+    FOREIGN KEY (anime_id) REFERENCES anime(anime_id),
+    FOREIGN KEY (genre_id) REFERENCES genres(genre_id)
 );
 
-CREATE TABLE lab_tests (
-    lab_test_id SERIAL PRIMARY KEY,
-    lab_name    TEXT NOT NULL UNIQUE,
-    unit_id     INTEGER NOT NULL,
-    FOREIGN KEY (unit_id) REFERENCES lab_units(unit_id)
-);
-
-CREATE TABLE diagnosis_codes (
-    diagnosis_code        TEXT PRIMARY KEY,
-    diagnosis_description TEXT NOT NULL
-);
-
--- Core tables
-CREATE TABLE patients (
-    patient_id     TEXT PRIMARY KEY,
-    patient_gender INTEGER,
-    patient_dob    TIMESTAMP NOT NULL,
-    patient_race   INTEGER,
-    patient_marital_status INTEGER,
-    patient_language INTEGER,
-    patient_population_pct_below_poverty REAL,
-    FOREIGN KEY (patient_gender) REFERENCES genders(gender_id),
-    FOREIGN KEY (patient_race) REFERENCES races(race_id),
-    FOREIGN KEY (patient_marital_status) REFERENCES marital_statuses(marital_status_id),
-    FOREIGN KEY (patient_language) REFERENCES languages(language_id)
-);
-
-CREATE TABLE admissions (
-    patient_id      TEXT NOT NULL,
-    admission_id    INTEGER NOT NULL,
-    admission_start TIMESTAMP NOT NULL,
-    admission_end   TIMESTAMP,
-    PRIMARY KEY (patient_id, admission_id),
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
-);
-
-CREATE TABLE admission_primary_diagnoses (
-    patient_id     TEXT NOT NULL,
-    admission_id   INTEGER NOT NULL,
-    diagnosis_code TEXT NOT NULL,
-    PRIMARY KEY (patient_id, admission_id),
-    FOREIGN KEY (patient_id, admission_id) REFERENCES admissions(patient_id, admission_id),
-    FOREIGN KEY (diagnosis_code) REFERENCES diagnosis_codes(diagnosis_code)
-);
-
-CREATE TABLE admission_lab_results (
-    patient_id    TEXT NOT NULL,
-    admission_id  INTEGER NOT NULL,
-    lab_test_id   INTEGER NOT NULL,
-    lab_value     REAL,
-    lab_datetime  TIMESTAMP NOT NULL,
-    FOREIGN KEY (patient_id, admission_id) REFERENCES admissions(patient_id, admission_id),
-    FOREIGN KEY (lab_test_id) REFERENCES lab_tests(lab_test_id),
-    UNIQUE (patient_id, admission_id, lab_test_id, lab_datetime)
+CREATE TABLE user_anime_ratings (
+    user_id        TEXT NOT NULL,
+    anime_id       TEXT NOT NULL,
+    user_score     REAL,
+    rating_date    TIMESTAMP,
+    watch_status_id INTEGER,
+    PRIMARY KEY (user_id, anime_id),
+    FOREIGN KEY (user_id)        REFERENCES users(user_id),
+    FOREIGN KEY (anime_id)       REFERENCES anime(anime_id),
+    FOREIGN KEY (watch_status_id) REFERENCES watch_statuses(watch_status_id)
 );
 """
 
 FILES = {
-    "patients": {
-        "filename": "PatientCorePopulatedTable.txt",
-     },
-    "admissions": {
-        "filename": "AdmissionsCorePopulatedTable.txt",
-     },
-    "diagnoses": {
-        "filename": "AdmissionsDiagnosesCorePopulatedTable.txt",
-     },
-    "labs": {
-        "filename": "LabsCorePopulatedTable.txt",
+    "anime": {
+        "filename": "AnimeCorePopulatedTable.txt",
+    },
+    "genres": {
+        "filename": "AnimeGenresCorePopulatedTable.txt",
+    },
+    "users": {
+        "filename": "UsersCorePopulatedTable.txt",
+    },
+    "ratings": {
+        "filename": "AnimeUserRatingsCorePopulatedTable.txt",
         "batch_size": 100_000,
-     }
+    },
 }
 
 EXPECTED_COLUMNS = {
-    "patients": [
-        "PatientID",
-        "PatientGender",
-        "PatientDateOfBirth",
-        "PatientRace",
-        "PatientMaritalStatus",
-        "PatientLanguage",
-        "PatientPopulationPercentageBelowPoverty",
+    "anime": [
+        "AnimeID",
+        "AnimeTitle",
+        "Type",
+        "Episodes",
+        "Status",
+        "StartDate",
+        "EndDate",
+        "Source",
+        "StudioName",
+        "RatingCategory",
+        "OverallScore",
+        "PopularityRank",
     ],
-    "admissions": [
-        "PatientID",
-        "AdmissionID",
-        "AdmissionStartDate",
-        "AdmissionEndDate",
+    "genres": [
+        "AnimeID",
+        "GenreName",
     ],
-    "diagnoses": [
-        "PatientID", 
-        "AdmissionID", 
-        "PrimaryDiagnosisCode", 
-        "PrimaryDiagnosisDescription",               
+    "users": [
+        "UserID",
+        "UserName",
+        "Country",
+        "AgeGroup",
+        "Gender",
     ],
-    "labs": [
-        "PatientID",
-        "AdmissionID",
-        "LabName",
-        "LabValue",
-        "LabUnits",
-        "LabDateTime",
-    ]
+    "ratings": [
+        "UserID",
+        "AnimeID",
+        "UserScore",
+        "RatingDate",
+        "WatchStatus",
+    ],
 }
+
 
 def load_tsv_to_stage(conn, filepath, stage_table, expected_columns, batch_size=5_000):
     path = Path(filepath)
@@ -197,7 +243,8 @@ def load_tsv_to_stage(conn, filepath, stage_table, expected_columns, batch_size=
         raise FileNotFoundError(f"Missing file: {filepath}")
 
     with path.open("r", encoding="utf-8-sig") as csvfile:
-        csv_reader = csv.DictReader(csvfile, delimiter='\t')
+        csv_reader = csv.DictReader(csvfile, delimiter="\t")
+
         # validate columns
         missing = sorted(set(expected_columns) - set(csv_reader.fieldnames))
         if missing:
@@ -206,15 +253,16 @@ def load_tsv_to_stage(conn, filepath, stage_table, expected_columns, batch_size=
         placeholders = ", ".join(["%s"] * len(expected_columns))
         sql = f"INSERT INTO {stage_table} ({', '.join(expected_columns)}) VALUES ({placeholders})"
         rows = []
-        row_count = 0 
+        row_count = 0
         total_count = 0
         cursor = conn.cursor()
-        
+
         cursor.execute(f"DELETE FROM {stage_table}")
         conn.commit()
         print(f"Cleaned up rows from {stage_table}")
-        
+
         log_template = "Inserted another batch of {:,} rows; total: {:,}"
+
         for row in csv_reader:
             rows.append([row.get(c, None) for c in expected_columns])
             row_count += 1
@@ -223,14 +271,14 @@ def load_tsv_to_stage(conn, filepath, stage_table, expected_columns, batch_size=
                 extras.execute_batch(cursor, sql, rows)
                 conn.commit()
                 total_count += len(rows)
-                row_count = 0 
-                rows = []  
+                row_count = 0
+                rows = []
                 print(log_template.format(batch_size, total_count))
 
         if rows:
             extras.execute_batch(cursor, sql, rows)
             conn.commit()
-            total_count += len(rows)  
+            total_count += len(rows)
             print(log_template.format(len(rows), total_count))
 
         cursor.close()
@@ -239,66 +287,117 @@ def load_tsv_to_stage(conn, filepath, stage_table, expected_columns, batch_size=
 
 def build_dimensions(conn):
     cur = conn.cursor()
-    
+
+    # Anime types (TV, Movie, OVA, etc.)
+    cur.execute(
+        """
+        INSERT INTO anime_types(type_name)
+        SELECT DISTINCT Type
+        FROM stage_anime
+        WHERE Type IS NOT NULL AND Type <> ''
+        ON CONFLICT (type_name) DO NOTHING;
+        """
+    )
+
+    # Anime statuses (Finished, Ongoing, etc.)
+    cur.execute(
+        """
+        INSERT INTO anime_statuses(status_desc)
+        SELECT DISTINCT Status
+        FROM stage_anime
+        WHERE Status IS NOT NULL AND Status <> ''
+        ON CONFLICT (status_desc) DO NOTHING;
+        """
+    )
+
+    # Studios
+    cur.execute(
+        """
+        INSERT INTO studios(studio_name)
+        SELECT DISTINCT StudioName
+        FROM stage_anime
+        WHERE StudioName IS NOT NULL AND StudioName <> ''
+        ON CONFLICT (studio_name) DO NOTHING;
+        """
+    )
+
+    # Sources (Manga, Light Novel, Original, etc.)
+    cur.execute(
+        """
+        INSERT INTO sources(source_name)
+        SELECT DISTINCT Source
+        FROM stage_anime
+        WHERE Source IS NOT NULL AND Source <> ''
+        ON CONFLICT (source_name) DO NOTHING;
+        """
+    )
+
+    # Rating categories (G, PG-13, R, etc.)
+    cur.execute(
+        """
+        INSERT INTO rating_categories(rating_code)
+        SELECT DISTINCT RatingCategory
+        FROM stage_anime
+        WHERE RatingCategory IS NOT NULL AND RatingCategory <> ''
+        ON CONFLICT (rating_code) DO NOTHING;
+        """
+    )
+
+    # Genres
+    cur.execute(
+        """
+        INSERT INTO genres(genre_name)
+        SELECT DISTINCT GenreName
+        FROM stage_genres
+        WHERE GenreName IS NOT NULL AND GenreName <> ''
+        ON CONFLICT (genre_name) DO NOTHING;
+        """
+    )
+
+    # Countries
+    cur.execute(
+        """
+        INSERT INTO countries(country_name)
+        SELECT DISTINCT Country
+        FROM stage_users
+        WHERE Country IS NOT NULL AND Country <> ''
+        ON CONFLICT (country_name) DO NOTHING;
+        """
+    )
+
+    # Age groups
+    cur.execute(
+        """
+        INSERT INTO age_groups(age_group_label)
+        SELECT DISTINCT AgeGroup
+        FROM stage_users
+        WHERE AgeGroup IS NOT NULL AND AgeGroup <> ''
+        ON CONFLICT (age_group_label) DO NOTHING;
+        """
+    )
+
     # Genders
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO genders(gender_desc)
-        SELECT DISTINCT PatientGender FROM stage_patients 
-        WHERE PatientGender IS NOT NULL AND PatientGender <> ''
+        SELECT DISTINCT Gender
+        FROM stage_users
+        WHERE Gender IS NOT NULL AND Gender <> ''
         ON CONFLICT (gender_desc) DO NOTHING;
-    """)
-    
-    # Races
-    cur.execute("""
-        INSERT INTO races(race_desc)
-        SELECT DISTINCT PatientRace FROM stage_patients 
-        WHERE PatientRace IS NOT NULL AND PatientRace <> ''
-        ON CONFLICT (race_desc) DO NOTHING;
-    """)
-    
-    # Marital statuses
-    cur.execute("""
-        INSERT INTO marital_statuses(marital_status_desc)
-        SELECT DISTINCT PatientMaritalStatus FROM stage_patients 
-        WHERE PatientMaritalStatus IS NOT NULL AND PatientMaritalStatus <> ''
-        ON CONFLICT (marital_status_desc) DO NOTHING;
-    """)
-    
-    # Languages
-    cur.execute("""
-        INSERT INTO languages(language_desc)
-        SELECT DISTINCT PatientLanguage FROM stage_patients 
-        WHERE PatientLanguage IS NOT NULL AND PatientLanguage <> ''
-        ON CONFLICT (language_desc) DO NOTHING;
-    """)
-    
-    # Lab units
-    cur.execute("""
-        INSERT INTO lab_units(unit_string)
-        SELECT DISTINCT LabUnits FROM stage_labs 
-        WHERE LabUnits IS NOT NULL AND LabUnits <> ''
-        ON CONFLICT (unit_string) DO NOTHING;
-    """)
-    
-    # Lab tests (LabName -> Unit)
-    cur.execute("""
-        INSERT INTO lab_tests(lab_name, unit_id)
-        SELECT DISTINCT s.LabName, u.unit_id
-        FROM stage_labs s
-        JOIN lab_units u ON u.unit_string = s.LabUnits
-        WHERE s.LabName IS NOT NULL AND s.LabName <> ''
-        ON CONFLICT (lab_name) DO NOTHING;
-    """)
-    
-    # Diagnosis codes
-    cur.execute("""
-        INSERT INTO diagnosis_codes(diagnosis_code, diagnosis_description)
-        SELECT DISTINCT PrimaryDiagnosisCode, PrimaryDiagnosisDescription
-        FROM stage_diagnoses
-        WHERE PrimaryDiagnosisCode IS NOT NULL AND PrimaryDiagnosisCode <> ''
-        ON CONFLICT (diagnosis_code) DO NOTHING;
-    """)
-    
+        """
+    )
+
+    # Watch statuses (Completed, Watching, Plan to Watch, etc.)
+    cur.execute(
+        """
+        INSERT INTO watch_statuses(status_desc)
+        SELECT DISTINCT WatchStatus
+        FROM stage_ratings
+        WHERE WatchStatus IS NOT NULL AND WatchStatus <> ''
+        ON CONFLICT (status_desc) DO NOTHING;
+        """
+    )
+
     conn.commit()
     cur.close()
     print("Dimension tables populated")
@@ -306,41 +405,71 @@ def build_dimensions(conn):
 
 def load_entities(conn):
     cur = conn.cursor()
-    
-    # Patients
-    cur.execute("""
-        INSERT INTO patients (
-            patient_id, patient_gender, patient_dob, patient_race,
-            patient_marital_status, patient_language, patient_population_pct_below_poverty
+
+    # Anime
+    cur.execute(
+        """
+        INSERT INTO anime (
+            anime_id,
+            title,
+            type_id,
+            status_id,
+            episodes,
+            start_date,
+            end_date,
+            source_id,
+            studio_id,
+            rating_category_id,
+            overall_score,
+            popularity_rank
         )
         SELECT
-            s.PatientID,
-            g.gender_id,
-            s.PatientDateOfBirth,
-            r.race_id,
-            m.marital_status_id,
-            l.language_id,
-            NULLIF(s.PatientPopulationPercentageBelowPoverty, '')::REAL
-        FROM stage_patients s
-        LEFT JOIN genders g ON g.gender_desc = s.PatientGender
-        LEFT JOIN races r ON r.race_desc = s.PatientRace
-        LEFT JOIN marital_statuses m ON m.marital_status_desc = s.PatientMaritalStatus
-        LEFT JOIN languages l ON l.language_desc = s.PatientLanguage
-        ON CONFLICT (patient_id) DO NOTHING;
-    """)
-    
-    # Admissions
-    cur.execute("""
-        INSERT INTO admissions (patient_id, admission_id, admission_start, admission_end)
+            s.AnimeID,
+            s.AnimeTitle,
+            t.type_id,
+            st.status_id,
+            NULLIF(s.Episodes, '')::INTEGER,
+            s.StartDate,
+            s.EndDate,
+            src.source_id,
+            stu.studio_id,
+            rc.rating_category_id,
+            NULLIF(s.OverallScore, '')::REAL,
+            NULLIF(s.PopularityRank, '')::INTEGER
+        FROM stage_anime s
+        LEFT JOIN anime_types t         ON t.type_name = s.Type
+        LEFT JOIN anime_statuses st     ON st.status_desc = s.Status
+        LEFT JOIN sources src           ON src.source_name = s.Source
+        LEFT JOIN studios stu           ON stu.studio_name = s.StudioName
+        LEFT JOIN rating_categories rc  ON rc.rating_code = s.RatingCategory
+        ON CONFLICT (anime_id) DO NOTHING;
+        """
+    )
+
+    # Users
+    cur.execute(
+        """
+        INSERT INTO users (
+            user_id,
+            user_name,
+            country_id,
+            age_group_id,
+            gender_id
+        )
         SELECT
-            s.PatientID,
-            s.AdmissionID::INTEGER,
-            s.AdmissionStartDate,
-            s.AdmissionEndDate
-        FROM stage_admissions s
-        ON CONFLICT (patient_id, admission_id) DO NOTHING;
-    """)
-    
+            s.UserID,
+            s.UserName,
+            c.country_id,
+            ag.age_group_id,
+            g.gender_id
+        FROM stage_users s
+        LEFT JOIN countries c  ON c.country_name = s.Country
+        LEFT JOIN age_groups ag ON ag.age_group_label = s.AgeGroup
+        LEFT JOIN genders g    ON g.gender_desc = s.Gender
+        ON CONFLICT (user_id) DO NOTHING;
+        """
+    )
+
     conn.commit()
     cur.close()
     print("Entity tables populated")
@@ -348,35 +477,45 @@ def load_entities(conn):
 
 def build_facts(conn):
     cur = conn.cursor()
-    
-    # Primary diagnoses
-    cur.execute("""
-        INSERT INTO admission_primary_diagnoses (patient_id, admission_id, diagnosis_code)
+
+    # Anime genres
+    cur.execute(
+        """
+        INSERT INTO anime_genres (anime_id, genre_id)
         SELECT
-            s.PatientID,
-            s.AdmissionID::INTEGER,
-            s.PrimaryDiagnosisCode
-        FROM stage_diagnoses s
-        JOIN diagnosis_codes d ON d.diagnosis_code = s.PrimaryDiagnosisCode
-        ON CONFLICT (patient_id, admission_id) DO NOTHING;
-    """)
-    
-    # Lab results
-    cur.execute("""
-        INSERT INTO admission_lab_results (
-            patient_id, admission_id, lab_test_id, lab_value, lab_datetime
+            s.AnimeID,
+            g.genre_id
+        FROM stage_genres s
+        JOIN genres g ON g.genre_name = s.GenreName
+        JOIN anime a ON a.anime_id = s.AnimeID
+        ON CONFLICT (anime_id, genre_id) DO NOTHING;
+        """
+    )
+
+    # User ratings
+    cur.execute(
+        """
+        INSERT INTO user_anime_ratings (
+            user_id,
+            anime_id,
+            user_score,
+            rating_date,
+            watch_status_id
         )
         SELECT
-            s.PatientID,
-            s.AdmissionID::INTEGER,
-            lt.lab_test_id,
-            NULLIF(s.LabValue, '')::REAL,
-            s.LabDateTime
-        FROM stage_labs s
-        JOIN lab_tests lt ON lt.lab_name = s.LabName
-        ON CONFLICT (patient_id, admission_id, lab_test_id, lab_datetime) DO NOTHING;
-    """)
-    
+            s.UserID,
+            s.AnimeID,
+            NULLIF(s.UserScore, '')::REAL,
+            s.RatingDate,
+            ws.watch_status_id
+        FROM stage_ratings s
+        JOIN watch_statuses ws ON ws.status_desc = s.WatchStatus
+        JOIN users u           ON u.user_id = s.UserID
+        JOIN anime a           ON a.anime_id = s.AnimeID
+        ON CONFLICT (user_id, anime_id) DO NOTHING;
+        """
+    )
+
     conn.commit()
     cur.close()
     print("Fact tables populated")
@@ -384,8 +523,8 @@ def build_facts(conn):
 
 # Main execution
 if __name__ == "__main__":
-    
     DATABASE_URL = get_db_url()
+
     # Create tables
     print("Creating tables...")
     conn = psycopg2.connect(DATABASE_URL)
@@ -400,14 +539,16 @@ if __name__ == "__main__":
     print("Loading staging data...")
     start_time = time.monotonic()
     conn = psycopg2.connect(DATABASE_URL)
+
     for name in FILES:
         load_tsv_to_stage(
-            conn, 
-            FILES[name]["filename"], 
-            f"stage_{name}", 
-            EXPECTED_COLUMNS[name], 
-            FILES[name].get("batch_size", 5_000)
+            conn,
+            FILES[name]["filename"],
+            f"stage_{name}",
+            EXPECTED_COLUMNS[name],
+            FILES[name].get("batch_size", 5_000),
         )
+
     conn.close()
     end_time = time.monotonic()
     elapsed_time = end_time - start_time
@@ -430,5 +571,5 @@ if __name__ == "__main__":
     conn = psycopg2.connect(DATABASE_URL)
     build_facts(conn)
     conn.close()
-    
-    print("\n✅ Database migration complete!")
+
+    print("\n✅ Anime database migration complete!")

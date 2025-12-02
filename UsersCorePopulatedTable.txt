@@ -1,0 +1,7 @@
+UserID	UserName	Country	AgeGroup	Gender
+U001	anime_nerd_01	United States	18-24	Male
+U002	shonen_fan_22	India	18-24	Male
+U003	ghibli_lover	Japan	25-34	Female
+U004	sliceoflife_girl	Canada	18-24	Female
+U005	sports_anime_guy	United Kingdom	25-34	Male
+U006	new_to_anime	Germany	18-24	Non-binary

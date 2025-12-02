@@ -17,57 +17,110 @@ HASHED_PASSWORD = st.secrets["HASHED_PASSWORD"].encode("utf-8")
 
 # Database schema for context
 DATABASE_SCHEMA = """
-Database Schema:
+Database Schema (Anime Data Warehouse):
 
-LOOKUP TABLES:
-- genders (gender_id SERIAL PRIMARY KEY, gender_desc TEXT)
-- races (race_id SERIAL PRIMARY KEY, race_desc TEXT)
-- marital_statuses (marital_status_id SERIAL PRIMARY KEY, marital_status_desc TEXT)
-- languages (language_id SERIAL PRIMARY KEY, language_desc TEXT)
-- lab_units (unit_id SERIAL PRIMARY KEY, unit_string TEXT)
-- lab_tests (lab_test_id SERIAL PRIMARY KEY, lab_name TEXT, unit_id INTEGER)
-- diagnosis_codes (diagnosis_code TEXT PRIMARY KEY, diagnosis_description TEXT)
-
-CORE TABLES:
-- patients (
-    patient_id TEXT PRIMARY KEY,
-    patient_gender INTEGER (FK to genders),
-    patient_dob TIMESTAMP,
-    patient_race INTEGER (FK to races),
-    patient_marital_status INTEGER (FK to marital_statuses),
-    patient_language INTEGER (FK to languages),
-    patient_population_pct_below_poverty REAL
+LOOKUP / DIMENSION TABLES:
+- anime_types (
+    type_id   SERIAL PRIMARY KEY,
+    type_name TEXT NOT NULL UNIQUE
   )
 
-- admissions (
-    patient_id TEXT,
-    admission_id INTEGER,
-    admission_start TIMESTAMP,
-    admission_end TIMESTAMP,
-    PRIMARY KEY (patient_id, admission_id)
+- anime_statuses (
+    status_id   SERIAL PRIMARY KEY,
+    status_desc TEXT NOT NULL UNIQUE
   )
 
-- admission_primary_diagnoses (
-    patient_id TEXT,
-    admission_id INTEGER,
-    diagnosis_code TEXT (FK to diagnosis_codes),
-    PRIMARY KEY (patient_id, admission_id)
+- studios (
+    studio_id   SERIAL PRIMARY KEY,
+    studio_name TEXT NOT NULL UNIQUE
   )
 
-- admission_lab_results (
-    patient_id TEXT,
-    admission_id INTEGER,
-    lab_test_id INTEGER (FK to lab_tests),
-    lab_value REAL,
-    lab_datetime TIMESTAMP
+- sources (
+    source_id   SERIAL PRIMARY KEY,
+    source_name TEXT NOT NULL UNIQUE
+  )
+
+- rating_categories (
+    rating_category_id SERIAL PRIMARY KEY,
+    rating_code        TEXT NOT NULL UNIQUE
+  )
+
+- genres (
+    genre_id   SERIAL PRIMARY KEY,
+    genre_name TEXT NOT NULL UNIQUE
+  )
+
+- countries (
+    country_id   SERIAL PRIMARY KEY,
+    country_name TEXT NOT NULL UNIQUE
+  )
+
+- age_groups (
+    age_group_id    SERIAL PRIMARY KEY,
+    age_group_label TEXT NOT NULL UNIQUE
+  )
+
+- genders (
+    gender_id   SERIAL PRIMARY KEY,
+    gender_desc TEXT NOT NULL UNIQUE
+  )
+
+- watch_statuses (
+    watch_status_id SERIAL PRIMARY KEY,
+    status_desc     TEXT NOT NULL UNIQUE
+  )
+
+CORE / ENTITY TABLES:
+- anime (
+    anime_id           TEXT PRIMARY KEY,
+    title              TEXT NOT NULL,
+    type_id            INTEGER REFERENCES anime_types(type_id),
+    status_id          INTEGER REFERENCES anime_statuses(status_id),
+    episodes           INTEGER,
+    start_date         TIMESTAMP,
+    end_date           TIMESTAMP,
+    source_id          INTEGER REFERENCES sources(source_id),
+    studio_id          INTEGER REFERENCES studios(studio_id),
+    rating_category_id INTEGER REFERENCES rating_categories(rating_category_id),
+    overall_score      REAL,
+    popularity_rank    INTEGER
+  )
+
+- users (
+    user_id      TEXT PRIMARY KEY,
+    user_name    TEXT NOT NULL,
+    country_id   INTEGER REFERENCES countries(country_id),
+    age_group_id INTEGER REFERENCES age_groups(age_group_id),
+    gender_id    INTEGER REFERENCES genders(gender_id)
+  )
+
+FACT TABLES:
+- anime_genres (
+    anime_id TEXT NOT NULL REFERENCES anime(anime_id),
+    genre_id INTEGER NOT NULL REFERENCES genres(genre_id),
+    PRIMARY KEY (anime_id, genre_id)
+  )
+
+- user_anime_ratings (
+    user_id        TEXT NOT NULL REFERENCES users(user_id),
+    anime_id       TEXT NOT NULL REFERENCES anime(anime_id),
+    user_score     REAL,
+    rating_date    TIMESTAMP,
+    watch_status_id INTEGER REFERENCES watch_statuses(watch_status_id),
+    PRIMARY KEY (user_id, anime_id)
   )
 
 IMPORTANT NOTES:
-- Use JOINs to get descriptive values from lookup tables
-- patient_dob, admission_start, admission_end, and lab_datetime are TIMESTAMP types
-- To calculate age: EXTRACT(YEAR FROM AGE(patient_dob))
-- To calculate length of stay: EXTRACT(EPOCH FROM (admission_end - admission_start)) / 86400 (gives days)
-- Always use proper JOINs for foreign key relationships
+- Use JOINs to bring in descriptive values from lookup tables (types, genres, studios, countries, etc.)
+- Typical joins:
+    anime  ↔ anime_types, anime_statuses, studios, sources, rating_categories
+    anime  ↔ anime_genres ↔ genres
+    users  ↔ countries, age_groups, genders
+    user_anime_ratings ↔ users, anime, watch_statuses
+- overall_score and user_score are REAL (numeric) values
+- rating_date, start_date, and end_date are TIMESTAMP types
+- You can compute aggregates like AVG(user_score), COUNT(*), etc.
+- For popularity_rank: lower value = more popular
 """
 
 
@@ -171,22 +224,22 @@ def extract_sql_from_response(response_text):
 
 def generate_sql_with_gpt(user_question):
     client = get_gemini_client()
-    prompt = f"""You are a STRICT PostgreSQL expert. Given the following database schema and a user's question, generate a valid accurate PostgreSQL query.
+    prompt = f"""You are a STRICT PostgreSQL expert and an assistant for an Anime analytics database. Given the following database schema and a user's question, generate a valid, accurate PostgreSQL query.
 
-{DATABASE_SCHEMA}
+    {DATABASE_SCHEMA}
 
-User Question: {user_question}
+    User Question: {user_question}
 
-Requirements:
-1. Generate ONLY the SQL query that I can directly use. No other response.
-2. Use proper JOINs to get descriptive names from lookup tables
-3. Use appropriate aggregations (COUNT, AVG, SUM, etc.) when needed
-4. Add LIMIT clauses for queries that might return many rows (default LIMIT 100)
-5. Use proper date/time functions for TIMESTAMP columns
-6. Make sure the query is syntactically correct for PostgreSQL
-7. Add helpful column aliases using AS
+    Requirements:
+    1. Generate ONLY the SQL query that I can directly use. No explanation, no backticks.
+    2. Use proper JOINs to bring in descriptive names from lookup tables
+    3. Use appropriate aggregations (COUNT, AVG, SUM, etc.) when needed.
+    4. Add LIMIT clauses for queries that might return many rows (default LIMIT 100).
+    5. Use proper date/time functions for TIMESTAMP columns (e.g., rating_date, start_date).
+    6. Make sure the query is syntactically correct for PostgreSQL.
+    7. Add helpful column aliases using AS.
 
-Generate the SQL query:"""
+    Generate the SQL query:"""
 
     try:
         response = client.generate_content(prompt)
@@ -195,7 +248,7 @@ Generate the SQL query:"""
 
     except Exception as e:
         st.error(f"Error calling Gemini API: {e}")
-        return None, None
+        return None
 
 
 def main():
@@ -208,12 +261,19 @@ def main():
     st.sidebar.title("💡 Example Questions")
     st.sidebar.markdown("""
     Try asking questions like:
-                        
-    **Demographics:**
-    - How many patients do we have by gender?
-                        
-    **Admissions:**
-    - What is the average length of stay?                      
+
+    **Anime stats:**
+    - What are the top 10 highest-rated anime?
+    - Show average user score by genre.
+    - List the most popular anime by studio.
+
+    **User behavior:**
+    - How many users are from each country?
+    - What is the distribution of watch status (Completed, Watching, etc.)?
+    - For each age group, what is the average user score?
+
+    **Combined:**
+    - For each genre, show the top 5 anime by average user score.
     """)
     st.sidebar.markdown("---")
     st.sidebar.info("""
@@ -242,9 +302,9 @@ def main():
     # main input
 
     user_question = st.text_area(
-        " What would you like to know?",
-        height=100, 
-        placeholder="What is the average length of stay?    "
+    "What would you like to know?",
+    height=100,
+    placeholder="Example: Show the top 10 anime by average user rating, with their genres and studios.",
     )
 
     col1, col2, col3 = st.columns([1, 1, 4])
