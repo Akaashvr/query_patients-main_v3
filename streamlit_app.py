@@ -267,9 +267,93 @@ def generate_sql_with_gpt(user_question):
         st.error(f"Error calling Gemini API: {e}")
         return None
 
+def apply_neon_theme():
+    st.markdown("""
+        <style>
+
+        /* GLOBAL BACKGROUND */
+        .stApp {
+            background-color: #0a0f1f !important;
+            color: #e6e6e6 !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #11ffee44;
+            border-radius: 10px;
+        }
+
+        /* HEADERS */
+        h1, h2, h3, h4 {
+            font-family: 'JetBrains Mono', monospace !important;
+            color: #11f7ff !important;
+            text-shadow: 0 0 10px #11ffeeaa;
+        }
+
+        /* SIDEBAR */
+        section[data-testid="stSidebar"] {
+            background-color: #0d1229 !important;
+            border-right: 1px solid #11ffef33;
+        }
+
+        /* BUTTONS */
+        div.stButton > button {
+            background-color: #0b132b;
+            border: 1px solid #11ffeeaa;
+            color: #11f7ff;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        div.stButton > button:hover {
+            background-color: #11ffee22;
+            color: white;
+            border-color: #11ffee;
+            box-shadow: 0 0 15px #11ffeeaa;
+        }
+
+        /* TEXT AREA + INPUTS */
+        textarea, input {
+            background-color: #111729 !important;
+            color: #c0faff !important;
+            border-radius: 6px !important;
+            border: 1px solid #11ffee44 !important;
+        }
+
+        /* DATAFRAME TABLE */
+        .stDataFrame, .dataframe {
+            background-color: #0d1229 !important;
+            color: #c6f7ff !important;
+            border: 1px solid #11ffee33 !important;
+        }
+
+        /* EXPANDERS */
+        .streamlit-expanderHeader {
+            color: #11f7ff !important;
+            font-weight: bold;
+            text-shadow: 0 0 5px #11ffee;
+        }
+
+        /* INFO BOXES */
+        .stAlert {
+            background-color: #112033 !important;
+            border-left: 3px solid #11ffeeaa !important;
+            color: #c6faff !important;
+        }
+
+        </style>
+    """, unsafe_allow_html=True)
+
 
 def main():
     require_login()
+    apply_neon_theme()
     st.title("🤖 AI-Powered SQL Query Assistant")
     st.markdown("Ask questions in natural language, and I will generate SQL queries for you to review and run!")
     st.markdown("---")
